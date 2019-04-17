@@ -46,13 +46,18 @@ int main() {
   }
 
   crossing = detectCrossing(michi);
-  printf("%f %f\n", crossing.x, crossing.y);
+  if( (crossing.x == -1) && (crossing.y == -1) ) {
+    printf("NA\n");
+  } else {
+    printf("%f %f\n", crossing.x, crossing.y);
+  }
   
   return 0;
 }
 
 coodinate detectCrossing(road* michi) {
   double s, t;
+  double x1, y1, x2, y2;
   double determinant;
   coodinate crossing;
   coodinate notExist = {-1, -1};
@@ -67,31 +72,42 @@ coodinate detectCrossing(road* michi) {
   q2X = michi[1].cood1.x;
   q2Y = michi[1].cood1.y;
 
-  // Meaning  michi[0]:L1, michi[1]:L2, cood1:Q, cood2:P
+
   determinant = ( (q1X - p1X)*(p2Y - q2Y) + (q2X - p2X)*(q1Y - p1Y) );
 
   // Step1
   if(determinant == 0) {
     return notExist;
   }
-
-  // --------------- OK ------------------
-  // Step2
-  s = ((q2Y - p2Y)*(p2X - p1X) - (q2X - p2X)*(p2Y - p1Y)) / determinant;
   
-  t = ((q1Y - p1Y)*(p2X - q1X) - (q1X - p1X)*(p2Y - p1Y)) / determinant;
+  // Step2
+  s = abs(((q2Y - p2Y)*(p2X - p1X) - (q2X - p2X)*(p2Y - p1Y))) / determinant;
+  t = abs(((q1Y - p1Y)*(p2X - p1X) - (q1X - p1X)*(p2Y - p1Y))) / determinant;
 
-  printf("%f %f\n", s, t);
+  printf("%f %f\n", s, t);  // test
 
   // Step3
   if( ((s >= 0)&&(s <= 1)) && ((t >= 0)&&(t <= 1))) {
     // Step 4
-    crossing.x = p1X + (q1X - p1X) * s;
-    crossing.y = p1Y + (q1Y - p1Y) * s;
+    x1 = p1X + (q1X - p1X) * s;
+    y1 = p1Y + (q1Y - p1Y) * s;
+    x2 = p2X + (q2X - p2X) * t;
+    y2 = p2Y + (q2Y - p2Y) * t;
+
+    printf("%f %f %f %f\n", x1, y1, x2, y2);  // test
+
+    // check whether the parameters are correct
+    if( (x1 == x2) && (y1 == y2) ) {
+      crossing.x = x1;
+      crossing.y = y1;
+
+      return crossing;
+    } else {
+      return notExist;
+    }
+    
   } else {
     return notExist;
   }
-
-  return crossing;
 }
 
