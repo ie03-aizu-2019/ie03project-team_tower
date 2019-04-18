@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+#define EPS 0.000000000001
 
 typedef struct {
   double x;
@@ -9,8 +10,8 @@ typedef struct {
 } coodinate;
 
 typedef struct {
-  coodinate cood1;
-  coodinate cood2;
+  coodinate coodQ;
+  coodinate coodP;
   int id;
 } road;
 
@@ -18,7 +19,7 @@ coodinate detectCrossing(road*);
 
 int main() {
   int n, m, p, q;
-  int coodId1, coodId2;
+  int coodIdQ, coodIdP;
   int i;
   coodinate crossing;
 
@@ -39,9 +40,9 @@ int main() {
 
   // input a road with two coodinates
   for(i = 0; i < m; i++) {
-    scanf("%d %d", &coodId1, &coodId2);
-    michi[i].cood1 = cood[coodId1 - 1];
-    michi[i].cood2 = cood[coodId2 - 1];
+    scanf("%d %d", &coodIdQ, &coodIdP);
+    michi[i].coodQ = cood[coodIdQ - 1];
+    michi[i].coodP = cood[coodIdP - 1];
     michi[i].id = i+1;
   }
 
@@ -63,26 +64,27 @@ coodinate detectCrossing(road* michi) {
   coodinate notExist = {-1, -1};
   double p1X, p1Y, q1X, q1Y, p2X, p2Y, q2X, q2Y;
 
-  p1X = michi[0].cood2.x;
-  p1Y = michi[0].cood2.y;
-  q1X = michi[0].cood1.x;
-  q1Y = michi[0].cood1.y;
-  p2X = michi[1].cood2.x;
-  p2Y = michi[1].cood2.y;
-  q2X = michi[1].cood1.x;
-  q2Y = michi[1].cood1.y;
+  p1X = michi[0].coodP.x;
+  p1Y = michi[0].coodP.y;
+  q1X = michi[0].coodQ.x;
+  q1Y = michi[0].coodQ.y;
+  p2X = michi[1].coodP.x;
+  p2Y = michi[1].coodP.y;
+  q2X = michi[1].coodQ.x;
+  q2Y = michi[1].coodQ.y;
 
 
   determinant = ( (q1X - p1X)*(p2Y - q2Y) + (q2X - p2X)*(q1Y - p1Y) );
 
   // Step1
-  if(determinant == 0) {
+  // 誤差を考慮する
+  if( (determinant <= EPS) && (determinant >= EPS) ) {
     return notExist;
   }
   
   // Step2
-  s = abs(((q2Y - p2Y)*(p2X - p1X) - (q2X - p2X)*(p2Y - p1Y))) / determinant;
-  t = abs(((q1Y - p1Y)*(p2X - p1X) - (q1X - p1X)*(p2Y - p1Y))) / determinant;
+  s = fabs(((q2Y - p2Y)*(p2X - p1X) - (q2X - p2X)*(p2Y - p1Y))) / determinant;
+  t = fabs(((q1Y - p1Y)*(p2X - p1X) - (q1X - p1X)*(p2Y - p1Y))) / determinant;
 
   printf("%f %f\n", s, t);  // test
 
@@ -97,7 +99,9 @@ coodinate detectCrossing(road* michi) {
     printf("%f %f %f %f\n", x1, y1, x2, y2);  // test
 
     // check whether the parameters are correct
-    if( (x1 == x2) && (y1 == y2) ) {
+    // 誤差を考慮する
+    if( ((fabs(x1 - x2) <= EPS) && (fabs(x1 - x2) >= EPS)) &&
+	((fabs(y1 - y2) <= EPS) && (fabs(y1 - y2) >= EPS)) ) {
       crossing.x = x1;
       crossing.y = y1;
 
