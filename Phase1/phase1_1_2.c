@@ -1,7 +1,9 @@
+/* This is mostly completed */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
-#define EPS 0.0001
+#define EPS 0.000001     // 10^(-6)
 
 typedef struct {
   double x;
@@ -63,7 +65,9 @@ t_point detectCrossing(t_road* michi) {
   t_point crossing;
   t_point notExist = {-1, -1};
   double p1X, p1Y, q1X, q1Y, p2X, p2Y, q2X, q2Y;
+  int i;
 
+  // generate error in this point
   p1X = michi[0].pointP.x;
   p1Y = michi[0].pointP.y;
   q1X = michi[0].pointQ.x;
@@ -72,7 +76,6 @@ t_point detectCrossing(t_road* michi) {
   p2Y = michi[1].pointP.y;
   q2X = michi[1].pointQ.x;
   q2Y = michi[1].pointQ.y;
-
 
   determinant = ( (q1X - p1X)*(p2Y - q2Y) + (q2X - p2X)*(q1Y - p1Y) );
 
@@ -86,8 +89,6 @@ t_point detectCrossing(t_road* michi) {
   s = fabs(((q2Y - p2Y)*(p2X - p1X) - (q2X - p2X)*(p2Y - p1Y))) / determinant;
   t = fabs(((q1Y - p1Y)*(p2X - p1X) - (q1X - p1X)*(p2Y - p1Y))) / determinant;
 
-  printf("%f %f\n", s, t);  // test
-
   // Step3
   if( ((s >= 0)&&(s <= 1)) && ((t >= 0)&&(t <= 1))) {
     // Step 4
@@ -96,12 +97,25 @@ t_point detectCrossing(t_road* michi) {
     x2 = p2X + (q2X - p2X) * t;
     y2 = p2Y + (q2Y - p2Y) * t;
 
-    printf("%f %f %f %f\n", x1, y1, x2, y2);  // test
-
-    // check whether the parameters are correct
+    // Check whether the crossing point is correct using parameter
     // 誤差を考慮する
-    if( ((fabs(x1 - x2) <= EPS) && (fabs(x1 - x2) >= EPS)) &&
-	((fabs(y1 - y2) <= EPS) && (fabs(y1 - y2) >= EPS)) ) {
+    if( (fabs(x1 - x2) <= EPS) && (fabs(y1 - y2) <= EPS) ) {
+
+      for(i = 0; i < 2; i++) {
+	// 線分の端点でないことを確認(端点 = 交差していないと考える)
+	if( (fabs(x1 - michi[i].pointP.x) <= EPS) ) {
+	  return notExist;
+	}
+	if( (fabs(x1 - michi[i].pointQ.x) <= EPS) ) {
+	  return notExist;
+	}
+	if( (fabs(y1 - michi[i].pointP.y) <= EPS) ) {
+	  return notExist;
+	}
+	if( (fabs(y1 - michi[i].pointQ.y) <= EPS) ) {
+	  return notExist;
+	}
+      }
       crossing.x = x1;
       crossing.y = y1;
 
