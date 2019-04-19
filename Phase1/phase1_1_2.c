@@ -1,47 +1,50 @@
+/* This is mostly completed */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+#define EPS 0.000001     // 10^(-6)
 
 typedef struct {
   double x;
   double y;
   int id;
-} coodinate;
+} t_point;
 
 typedef struct {
-  coodinate cood1;
-  coodinate cood2;
+  t_point pointQ;
+  t_point pointP;
   int id;
-} road;
+} t_road;
 
-coodinate detectCrossing(road*);
+t_point detectCrossing(t_road*);
 
 int main() {
   int n, m, p, q;
-  int coodId1, coodId2;
+  int pointIdQ, pointIdP;
   int i;
-  coodinate crossing;
+  t_point crossing;
 
-  coodinate *cood;
-  road *michi;
+  t_point *point;
+  t_road *michi;
 
   // input the number of each component
   scanf("%d %d %d %d", &n, &m, &p, &q);
 
-  cood = (coodinate*)malloc(sizeof(coodinate) * n);
-  michi = (road*)malloc(sizeof(road) * m);
+  point = (t_point*)malloc(sizeof(t_point) * n);
+  michi = (t_road*)malloc(sizeof(t_road) * m);
 
   // input coodinates
   for(i = 0; i < n; i++) {
-    scanf("%lf %lf", &cood[i].x, &cood[i].y);
-    cood[i].id = i+1;
+    scanf("%lf %lf", &point[i].x, &point[i].y);
+    point[i].id = i+1;
   }
 
   // input a road with two coodinates
   for(i = 0; i < m; i++) {
-    scanf("%d %d", &coodId1, &coodId2);
-    michi[i].cood1 = cood[coodId1 - 1];
-    michi[i].cood2 = cood[coodId2 - 1];
+    scanf("%d %d", &pointIdQ, &pointIdP);
+    michi[i].pointQ = point[pointIdQ - 1];
+    michi[i].pointP = point[pointIdP - 1];
     michi[i].id = i+1;
   }
 
@@ -55,36 +58,36 @@ int main() {
   return 0;
 }
 
-coodinate detectCrossing(road* michi) {
+t_point detectCrossing(t_road* michi) {
   double s, t;
   double x1, y1, x2, y2;
   double determinant;
-  coodinate crossing;
-  coodinate notExist = {-1, -1};
+  t_point crossing;
+  t_point notExist = {-1, -1};
   double p1X, p1Y, q1X, q1Y, p2X, p2Y, q2X, q2Y;
+  int i;
 
-  p1X = michi[0].cood2.x;
-  p1Y = michi[0].cood2.y;
-  q1X = michi[0].cood1.x;
-  q1Y = michi[0].cood1.y;
-  p2X = michi[1].cood2.x;
-  p2Y = michi[1].cood2.y;
-  q2X = michi[1].cood1.x;
-  q2Y = michi[1].cood1.y;
-
+  // generate error in this point
+  p1X = michi[0].pointP.x;
+  p1Y = michi[0].pointP.y;
+  q1X = michi[0].pointQ.x;
+  q1Y = michi[0].pointQ.y;
+  p2X = michi[1].pointP.x;
+  p2Y = michi[1].pointP.y;
+  q2X = michi[1].pointQ.x;
+  q2Y = michi[1].pointQ.y;
 
   determinant = ( (q1X - p1X)*(p2Y - q2Y) + (q2X - p2X)*(q1Y - p1Y) );
 
   // Step1
-  if(determinant == 0) {
+  // 誤差を考慮する
+  if( (determinant <= EPS) && (determinant >= EPS) ) {
     return notExist;
   }
   
   // Step2
-  s = abs(((q2Y - p2Y)*(p2X - p1X) - (q2X - p2X)*(p2Y - p1Y))) / determinant;
-  t = abs(((q1Y - p1Y)*(p2X - p1X) - (q1X - p1X)*(p2Y - p1Y))) / determinant;
-
-  printf("%f %f\n", s, t);  // test
+  s = fabs(((q2Y - p2Y)*(p2X - p1X) - (q2X - p2X)*(p2Y - p1Y))) / determinant;
+  t = fabs(((q1Y - p1Y)*(p2X - p1X) - (q1X - p1X)*(p2Y - p1Y))) / determinant;
 
   // Step3
   if( ((s >= 0)&&(s <= 1)) && ((t >= 0)&&(t <= 1))) {
@@ -94,10 +97,25 @@ coodinate detectCrossing(road* michi) {
     x2 = p2X + (q2X - p2X) * t;
     y2 = p2Y + (q2Y - p2Y) * t;
 
-    printf("%f %f %f %f\n", x1, y1, x2, y2);  // test
+    // Check whether the crossing point is correct using parameter
+    // 誤差を考慮する
+    if( (fabs(x1 - x2) <= EPS) && (fabs(y1 - y2) <= EPS) ) {
 
-    // check whether the parameters are correct
-    if( (x1 == x2) && (y1 == y2) ) {
+      for(i = 0; i < 2; i++) {
+	// 線分の端点でないことを確認(端点 = 交差していないと考える)
+	if( (fabs(x1 - michi[i].pointP.x) <= EPS) ) {
+	  return notExist;
+	}
+	if( (fabs(x1 - michi[i].pointQ.x) <= EPS) ) {
+	  return notExist;
+	}
+	if( (fabs(y1 - michi[i].pointP.y) <= EPS) ) {
+	  return notExist;
+	}
+	if( (fabs(y1 - michi[i].pointQ.y) <= EPS) ) {
+	  return notExist;
+	}
+      }
       crossing.x = x1;
       crossing.y = y1;
 
