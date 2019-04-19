@@ -109,12 +109,8 @@ t_point detectCrossing(t_road* michi) {
       crossing.y = y1;
 
       return crossing;
-    } else {
-      return notExist;
     }
-    
-  } else {
-    return notExist;
   }
+  return notExist;
 }
 
