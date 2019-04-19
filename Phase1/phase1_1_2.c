@@ -67,7 +67,6 @@ t_point detectCrossing(t_road* michi) {
   double p1X, p1Y, q1X, q1Y, p2X, p2Y, q2X, q2Y;
   int i;
 
-  // generate error in this point
   p1X = michi[0].pointP.x;
   p1Y = michi[0].pointP.y;
   q1X = michi[0].pointQ.x;
@@ -80,7 +79,6 @@ t_point detectCrossing(t_road* michi) {
   determinant = ( (q1X - p1X)*(p2Y - q2Y) + (q2X - p2X)*(q1Y - p1Y) );
 
   // Step1
-  // 誤差を考慮する
   if( (determinant <= EPS) && (determinant >= EPS) ) {
     return notExist;
   }
@@ -98,21 +96,12 @@ t_point detectCrossing(t_road* michi) {
     y2 = p2Y + (q2Y - p2Y) * t;
 
     // Check whether the crossing point is correct using parameter
-    // 誤差を考慮する
     if( (fabs(x1 - x2) <= EPS) && (fabs(y1 - y2) <= EPS) ) {
 
       for(i = 0; i < 2; i++) {
-	// 線分の端点でないことを確認(端点 = 交差していないと考える)
-	if( (fabs(x1 - michi[i].pointP.x) <= EPS) ) {
-	  return notExist;
-	}
-	if( (fabs(x1 - michi[i].pointQ.x) <= EPS) ) {
-	  return notExist;
-	}
-	if( (fabs(y1 - michi[i].pointP.y) <= EPS) ) {
-	  return notExist;
-	}
-	if( (fabs(y1 - michi[i].pointQ.y) <= EPS) ) {
+	// Is the point a part of the line edges?
+	if( (fabs(x1 - michi[i].pointP.x) <= EPS) || (fabs(x1 - michi[i].pointQ.x) <= EPS)
+	    || (fabs(y1 - michi[i].pointP.y) <= EPS) || (fabs(y1 - michi[i].pointQ.y) <= EPS) ) {
 	  return notExist;
 	}
       }
