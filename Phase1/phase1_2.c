@@ -1,4 +1,4 @@
-/* テストケースでid2と3の道路の交差地点はNAであるはずだが、7.0,1.0となる */
+/* OK */
 
 #include <stdio.h>
 #include <stdlib.h>
