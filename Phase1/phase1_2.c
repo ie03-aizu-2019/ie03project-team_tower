@@ -52,20 +52,16 @@ int main() {
 
   for(i = 0; i < (m - 1); i++) {
     for(j = i+1; j < m; j++) {
-      printf("%dと%d: %f %f %f %f / %f %f %f %f\n", i, j, michi[i].pointP.x, michi[i].pointP.y,
-	     michi[i].pointQ.x, michi[i].pointQ.y, michi[j].pointP.x, michi[j].pointP.y,
-	     michi[j].pointQ.x, michi[j].pointQ.y);  // test
       crossing[index] = detectCrossing(michi, i, j);
-      printf("%f %f\n\n", crossing[index].x, crossing[index].y);
       index++;
     }
   }
 
   for(i = 0; i < index; i++) {
     if( (crossing[i].x == -1) && (crossing[i].y == -1) ) {
-      //printf("NA\n");
+      printf("");
     } else {
-      //printf("%f %f\n", crossing[i].x, crossing[i].y);
+      printf("%f %f\n", crossing[i].x, crossing[i].y);
     }
   }
   
@@ -79,6 +75,7 @@ t_point detectCrossing(t_road* michi, int roadNumberA, int roadNumberB) {
   t_point crossing;
   t_point notExist = {-1, -1};
   double p1X, p1Y, q1X, q1Y, p2X, p2Y, q2X, q2Y;
+  int i, index;
 
   p1X = michi[roadNumberA].pointP.x;
   p1Y = michi[roadNumberA].pointP.y;
@@ -111,12 +108,14 @@ t_point detectCrossing(t_road* michi, int roadNumberA, int roadNumberB) {
     // Check whether the crossing point is correct using parameter
     if( (fabs(x1 - x2) <= EPS) && (fabs(y1 - y2) <= EPS) ) {
 
+      index = roadNumberA;
       for(i = 0; i < 2; i++) {
 	// Is the point a part of the line edges?
-	if( (fabs(x1 - michi[i].pointP.x) <= EPS) || (fabs(x1 - michi[i].pointQ.x) <= EPS)
-	    || (fabs(y1 - michi[i].pointP.y) <= EPS) || (fabs(y1 - michi[i].pointQ.y) <= EPS) ) {
+	if( (fabs(x1 - michi[index].pointP.x) <= EPS) || (fabs(x1 - michi[index].pointQ.x) <= EPS)
+	    || (fabs(y1 - michi[index].pointP.y) <= EPS) || (fabs(y1 - michi[index].pointQ.y) <= EPS) ) {
 	  return notExist;
 	}
+	index = roadNumberB;
       }
       crossing.x = x1;
       crossing.y = y1;
