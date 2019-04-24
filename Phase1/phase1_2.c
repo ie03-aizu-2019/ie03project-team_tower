@@ -156,6 +156,11 @@ void sortCrossing(t_point* crossing, int index) {
     }
   }
 
+  // idを更新
+  for(i = 0; i < index; i++) {
+    crossing[i].id = i+1;
+  }
+
   return;
 }
 
