@@ -18,13 +18,15 @@ typedef struct {
   int id;
 } t_road;
 
-t_point detectCrossing(t_road*, int, int);
+t_point detectCrossing (t_road*, int, int);
+void sortCrossing (t_point*, int);
 
 int main() {
   int n, m, p, q;
   int pointIdQ, pointIdP;
   int i, j;
   int index = 0;
+  t_point tmpCrossing;
   t_point crossing[CROSS] = {0};
 
   t_point *point;
@@ -53,29 +55,26 @@ int main() {
   // 全ての線分の組み合わせについて、交差地点を調べる
   for(i = 0; i < (m - 1); i++) {
     for(j = i+1; j < m; j++) {
-      crossing[index] = detectCrossing(michi, i, j);
-      index++;
+      tmpCrossing = detectCrossing(michi, i, j);
+      if( (tmpCrossing.x != -1) && (tmpCrossing.y != -1) ){
+	crossing[index] = tmpCrossing;
+	index++;
+      }
     }
   }
 
   /* ここにソートの実装をする */
-  /* --------------------- */
-  /* --------------------- */
-  /* --------------------- */
-  /* --------------------- */
+  sortCrossing(crossing, index);  // ソートする関数を別に作った
 
   // 交差地点の表示
   for(i = 0; i < index; i++) {
-    if( (crossing[i].x == -1) && (crossing[i].y == -1) ) {
-      printf("");
-    } else {
-      printf("%f %f\n", crossing[i].x, crossing[i].y);
-    }
+    printf("%f %f\n", crossing[i].x, crossing[i].y);
   }
   
   return 0;
 }
 
+// 交差地点を返す関数, ない場合はNotExist{-1, -1}を返す
 t_point detectCrossing(t_road* michi, int roadNumberA, int roadNumberB) {
   double s, t;
   double x, y;
@@ -94,6 +93,7 @@ t_point detectCrossing(t_road* michi, int roadNumberA, int roadNumberB) {
   q2X = michi[roadNumberB].pointQ.x;
   q2Y = michi[roadNumberB].pointQ.y;
 
+  // 行列式を求める
   determinant = ( (q1X - p1X)*(p2Y - q2Y) + (q2X - p2X)*(q1Y - p1Y) );
 
   // Step1
@@ -118,8 +118,6 @@ t_point detectCrossing(t_road* michi, int roadNumberA, int roadNumberB) {
     // 交差地点を求める
     x = p1X + (q1X - p1X) * s;
     y = p1Y + (q1Y - p1Y) * s;
-    x = p2X + (q2X - p2X) * t;
-    y = p2Y + (q2Y - p2Y) * t;
 
     crossing.x = x;
     crossing.y = y;
@@ -131,4 +129,35 @@ t_point detectCrossing(t_road* michi, int roadNumberA, int roadNumberB) {
     return notExist;
   }
 }
+
+// 交差地点をソートする関数
+void sortCrossing(t_point* crossing, int index) {
+  int i, j;
+  t_point tmpPoint;
+
+  // バブルソート
+  for(i = 0; i < (index - 1); i++) {
+    for(j = (index - 1); j > i; j--) {
+      // x座標の小さい順に並べる
+      if(crossing[j-1].x > crossing[j].x) {
+	tmpPoint = crossing[j-1];
+	crossing[j-1] = crossing[j];
+	crossing[j] = tmpPoint;
+      }
+      // x座標が同じ交差地点だった場合
+      if( (fabs(crossing[j-1].x - crossing[j].x) <= EPS) ) {
+	// y座標がより小さい順に並べる
+	if(crossing[j-1].y > crossing[j].y) {
+	  tmpPoint = crossing[j-1];
+	  crossing[j-1] = crossing[j];
+	  crossing[j] = tmpPoint;
+	}
+      }
+    }
+  }
+
+  return;
+}
+
+
 
