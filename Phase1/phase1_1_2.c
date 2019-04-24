@@ -88,29 +88,26 @@ t_point detectCrossing(t_road* michi) {
   t = fabs(((q1Y - p1Y)*(p2X - p1X) - (q1X - p1X)*(p2Y - p1Y))) / determinant;
 
   // Step3
-  if( ((s >= 0)&&(s <= 1)) && ((t >= 0)&&(t <= 1))) {
+  if( ((s <= EPS)&&(s >= EPS)) || ((t >= EPS)&&(t <= EPS)) ||
+      ((s-1 <= EPS)&&(s-1 >= EPS)) || ((t-1 <= EPS)&&(t-1 >= EPS)) ) {
+    return notExist;
+  }
+  
+  else if( ((s > 0)&&(s < 1)) && ((t > 0)&&(t < 1))) {
     // Step 4
     x1 = p1X + (q1X - p1X) * s;
     y1 = p1Y + (q1Y - p1Y) * s;
     x2 = p2X + (q2X - p2X) * t;
     y2 = p2Y + (q2Y - p2Y) * t;
 
-    // Check whether the crossing point is correct using parameter
-    if( (fabs(x1 - x2) <= EPS) && (fabs(y1 - y2) <= EPS) ) {
+    crossing.x = x1;
+    crossing.y = y1;
 
-      for(i = 0; i < 2; i++) {
-	// Is the point a part of the line edges?
-	if( (fabs(x1 - michi[i].pointP.x) <= EPS) || (fabs(x1 - michi[i].pointQ.x) <= EPS)
-	    || (fabs(y1 - michi[i].pointP.y) <= EPS) || (fabs(y1 - michi[i].pointQ.y) <= EPS) ) {
-	  return notExist;
-	}
-      }
-      crossing.x = x1;
-      crossing.y = y1;
-
-      return crossing;
-    }
+    return crossing;
   }
-  return notExist;
+
+  else {
+    return notExist;
+  }
 }
 
