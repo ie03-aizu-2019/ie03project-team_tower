@@ -60,7 +60,7 @@ int main() {
 
 t_point detectCrossing(t_road* michi) {
   double s, t;
-  double x1, y1, x2, y2;
+  double x, y;
   double determinant;
   t_point crossing;
   t_point notExist = {-1, -1};
@@ -95,13 +95,11 @@ t_point detectCrossing(t_road* michi) {
   
   else if( ((s > 0)&&(s < 1)) && ((t > 0)&&(t < 1))) {
     // Step 4
-    x1 = p1X + (q1X - p1X) * s;
-    y1 = p1Y + (q1Y - p1Y) * s;
-    x2 = p2X + (q2X - p2X) * t;
-    y2 = p2Y + (q2Y - p2Y) * t;
+    x = p1X + (q1X - p1X) * s;
+    y = p1Y + (q1Y - p1Y) * s;
 
-    crossing.x = x1;
-    crossing.y = y1;
+    crossing.x = x;
+    crossing.y = y;
 
     return crossing;
   }
