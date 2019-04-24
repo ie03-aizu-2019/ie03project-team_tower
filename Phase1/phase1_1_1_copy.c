@@ -64,7 +64,10 @@ coodinate cross_detection(coodinate *c){
   t = fabs( ( (yq1-yp1)*(xp2-xp1) - (xq1-xp1)*(yp2-yp1) ) ) / A;
 
   /*  step3  */
-  if( ( (s >= 0) && (s <= 1) ) && ( (t >= 0) && (t <= 1) ) ){
+  if( ( (s <= EPS) && (s >= EPS) ) || ( (t <= EPS) && (t >= EPS) )
+   || ( ((s-1) <= EPS) && ((s-1)>= EPS) ) || ( ((t-1) <= EPS) && ((t-1) >= EPS) ))return NA;
+  
+  else if( ( (s >= 0) && (s <= 1) ) && ( (t >= 0) && (t <= 1) ) ){
 
   /*  step4  */
     cross_point.x = xp1 + (xq1 - xp1) * s;
