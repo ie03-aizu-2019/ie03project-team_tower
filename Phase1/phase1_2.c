@@ -1,4 +1,4 @@
-/* テストケースでid2と3の道路の交差地点はNAであるはずだが、7.0,1.0となる */
+/* 関数内の線分端点判定をシンプルにする */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -30,19 +30,19 @@ int main() {
   t_point *point;
   t_road *michi;
 
-  // input the number of each component
+  // 座標の数、線分の本数の入力
   scanf("%d %d %d %d", &n, &m, &p, &q);
 
   point = (t_point*)malloc(sizeof(t_point) * n);
   michi = (t_road*)malloc(sizeof(t_road) * m);
 
-  // input coodinates
+  // 座標を入力し、座標の構造体へ格納
   for(i = 0; i < n; i++) {
     scanf("%lf %lf", &point[i].x, &point[i].y);
     point[i].id = i+1;
   }
 
-  // input a road with two coodinates
+  // 二つの線分の端点P, Q を入力し、線分を作って線分の構造体へ格納
   for(i = 0; i < m; i++) {
     scanf("%d %d", &pointIdQ, &pointIdP);
     michi[i].pointQ = point[pointIdQ - 1];
@@ -50,6 +50,7 @@ int main() {
     michi[i].id = i+1;
   }
 
+  // 全ての線分の組み合わせについて、交差地点を調べる
   for(i = 0; i < (m - 1); i++) {
     for(j = i+1; j < m; j++) {
       crossing[index] = detectCrossing(michi, i, j);
@@ -57,6 +58,13 @@ int main() {
     }
   }
 
+  /* ここにソートの実装をする */
+  /* --------------------- */
+  /* --------------------- */
+  /* --------------------- */
+  /* --------------------- */
+
+  // 交差地点の表示
   for(i = 0; i < index; i++) {
     if( (crossing[i].x == -1) && (crossing[i].y == -1) ) {
       printf("");
@@ -70,7 +78,7 @@ int main() {
 
 t_point detectCrossing(t_road* michi, int roadNumberA, int roadNumberB) {
   double s, t;
-  double x1, y1, x2, y2;
+  double x, y;
   double determinant;
   t_point crossing;
   t_point notExist = {-1, -1};
@@ -94,35 +102,33 @@ t_point detectCrossing(t_road* michi, int roadNumberA, int roadNumberB) {
   }
   
   // Step2
+  // パラメータを求める
   s = fabs(((q2Y - p2Y)*(p2X - p1X) - (q2X - p2X)*(p2Y - p1Y))) / determinant;
   t = fabs(((q1Y - p1Y)*(p2X - p1X) - (q1X - p1X)*(p2Y - p1Y))) / determinant;
 
   // Step3
-  if( ((s >= 0)&&(s <= 1)) && ((t >= 0)&&(t <= 1))) {
-    // Step 4
-    x1 = p1X + (q1X - p1X) * s;
-    y1 = p1Y + (q1Y - p1Y) * s;
-    x2 = p2X + (q2X - p2X) * t;
-    y2 = p2Y + (q2Y - p2Y) * t;
-
-    // Check whether the crossing point is correct using parameter
-    if( (fabs(x1 - x2) <= EPS) && (fabs(y1 - y2) <= EPS) ) {
-
-      index = roadNumberA;
-      for(i = 0; i < 2; i++) {
-	// Is the point a part of the line edges?
-	if( (fabs(x1 - michi[index].pointP.x) <= EPS) || (fabs(x1 - michi[index].pointQ.x) <= EPS)
-	    || (fabs(y1 - michi[index].pointP.y) <= EPS) || (fabs(y1 - michi[index].pointQ.y) <= EPS) ) {
-	  return notExist;
-	}
-	index = roadNumberB;
-      }
-      crossing.x = x1;
-      crossing.y = y1;
-
-      return crossing;
-    }
+  // 線分の端点にある場合(s == 0, 1 or t == 0, 1)は交差地点でない
+  if( ((s <= EPS)&&(s >= EPS)) || ((t >= EPS)&&(t <= EPS)) ||
+      ((s-1 <= EPS)&&(s-1 >= EPS)) || ((t-1 <= EPS)&&(t-1 >= EPS)) ) {
+    return notExist;
   }
-  return notExist;
+  
+  else if( ((s > 0)&&(s < 1)) && ((t > 0)&&(t < 1))) {
+    // Step 4
+    // 交差地点を求める
+    x = p1X + (q1X - p1X) * s;
+    y = p1Y + (q1Y - p1Y) * s;
+    x = p2X + (q2X - p2X) * t;
+    y = p2Y + (q2Y - p2Y) * t;
+
+    crossing.x = x;
+    crossing.y = y;
+
+    return crossing;
+  }
+
+  else {
+    return notExist;
+  }
 }
 
