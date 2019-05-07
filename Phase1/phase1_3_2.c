@@ -16,18 +16,19 @@ typedef struct {
   int id;
 } t_point;
 
-typedef struct {
-  t_point pointQ;
-  t_point pointP;
-  int id;
-} t_road;
-
 // 交点の構造体
 typedef struct {
   t_point point;
   int michiA;  // 交差している線分Aのid
   int michiB;  // 交差している線分Bのid
 } t_crossing;
+
+typedef struct {
+  t_point pointP;
+  t_point pointQ;
+  t_crossing cross[CROSS];  // 線分上の交点
+  int id;
+} t_road;
 
 typedef struct {
   int isCrossing;   // Point : 0 , Crossing_point : 1 .
@@ -59,6 +60,9 @@ int main() {
   t_road *michi;
   start_end *s_e;
 
+  int roadid;
+  int crossCount[CROSS];  // 各線分の交点の数を保持
+
   // 座標の数、線分の本数の入力
   scanf("%d %d %d %d", &n, &m, &p, &q);
 
@@ -75,9 +79,24 @@ int main() {
 
   // 二つの線分の端点P, Q を入力し、線分を作って線分の構造体へ格納
   for(i = 0; i < m; i++) {
-    scanf("%d %d", &pointIdQ, &pointIdP);
-    michi[i].pointQ = point[pointIdQ - 1];
-    michi[i].pointP = point[pointIdP - 1];
+    scanf("%d %d", &pointIdP, &pointIdQ);
+    // x座標が小さいほうを線分の端点Pとする
+    if(point[pointIdP - 1].x < point[pointIdQ - 1].x) {
+      michi[i].pointP = point[pointIdP - 1];
+      michi[i].pointQ = point[pointIdQ - 1];
+    } else if(point[pointIdP - 1].x == point[pointIdQ - 1].x) {
+      // もしx座標が同じなら、y座標が小さいほうを線分の端点Pとする
+      if(point[pointIdP - 1].y < point[pointIdQ - 1].y) {
+	michi[i].pointP = point[pointIdP - 1];
+	michi[i].pointQ = point[pointIdQ - 1];
+      } else {
+	michi[i].pointP = point[pointIdQ - 1];
+	michi[i].pointQ = point[pointIdP - 1];
+      }
+    } else {
+      michi[i].pointP = point[pointIdQ - 1];
+      michi[i].pointQ = point[pointIdP - 1];
+    }
     michi[i].id = i+1;
   }
 
@@ -116,6 +135,19 @@ int main() {
 
   /* ここにソートの実装をする */
   sortCrossing(crossing, index);  // ソートする関数を別に作った
+
+  // 交差地点をそれぞれの線分構造体の交点に格納
+  for(i = 0; i < index; i++) {
+    roadid = crossing[i].michiA - 1;
+    michi[roadid].cross[crossCount[roadid]] = crossing[i];
+    crossCount[roadid]++;  // 線分構造体の中の交点の数をアップ
+  }
+
+  // 各線分の交点の数を表示するテスト
+  for(i = 0; i < m; i++) {
+    printf("線分id:%d, 交点の数:%d\n", i+1, crossCount[i]);
+  }
+  
 
   // 交差地点の表示
   for(i = 0; i < index; i++) {
