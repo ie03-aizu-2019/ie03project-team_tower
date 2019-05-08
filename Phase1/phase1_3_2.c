@@ -1,6 +1,5 @@
 /* s1250183 */
 /* 小課題3の関数部分の実装 */
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
@@ -12,21 +11,17 @@
 typedef struct {
   double x;
   double y;
-  int id;      // 座標のid 
+  int id;
+  int michiA;  // 線分Aのid(線分A上の点であることを示す)
+  int michiB;  // 線分Bのid(線分B上の点でもあることを示す、交差地点用)
 } t_point;
 
-// 交点の構造体
+// 線分の構造体
 typedef struct {
-  t_point point;
-  int michiA;  // 交差している線分Aのid
-  int michiB;  // 交差している線分Bのid
-} t_crossing;
-
-typedef struct {
-  t_point pointP;
-  t_point pointQ;
-  t_crossing cross[CROSS];  // 線分上の交点
-  int id;  // 道のid
+  t_point pointP;        // 線分の端点P 
+  t_point pointQ;        // 線分の端点Q
+  t_point cross[CROSS];  // 線分上の交点
+  int id;                // 線分のid
 } t_road;
 
 typedef struct {
@@ -40,20 +35,23 @@ typedef struct {
   int enigma;  // 3番目の入力データはまだ何に使われるかわからない.
 } start_end;
 
-t_point detectCrossing (t_road*, int, int);
-void sortCrossing (t_crossing*, int);
+t_point detectCrossing (t_road*, int, int);  // 交差地点を出す関数
+void sortCrossing (t_point*, int, int);      // 交差地点をxが小さい順にソートする関数
 p_info pointRead(char*);
-void Test_start_end(start_end*, int); // 表示テスト用の関数.
+void Test_start_end(start_end*, int);        // 表示テスト用の関数.
+double calcDistance(t_point, t_point);       // 座標間の距離を求めて返す関数
 
 int main() {
   int n, m, p, q;
-  int pointIdQ, pointIdP;
+  int pointIdP, pointIdQ;
   int i, j;
   int index = 0;
+  
   char point_c[DIGIT];
   p_info tempPoint;
+  
   t_point tmpCrossing;
-  t_crossing crossing[CROSS] = {0};
+  t_point crossing[CROSS] = {0};
 
   t_point *point;
   t_road *michi;
@@ -62,7 +60,12 @@ int main() {
   int roadid;
   int crossCount[CROSS];  // 各線分の交点の数を保持
 
-  int edge[CROSS][CROSS]; // 辺
+  int edge[CROSS][CROSS] = {0}; // 辺
+  int idP;
+  int idQ;
+  int idCross;
+  int idCrossNext;
+  int lastCrossIndex;
 
          /* 入力部分 */
   // 座標の数、線分の本数の入力
@@ -99,7 +102,13 @@ int main() {
       michi[i].pointP = point[pointIdQ - 1];
       michi[i].pointQ = point[pointIdP - 1];
     }
-    michi[i].id = i+1;
+    michi[i].pointP.michiA = i+1;   // Pは線分の端点である
+    michi[i].pointP.michiB = -1;    // 端点であるため、こっちはなし
+    
+    michi[i].pointQ.michiA = i+1;   // Qは線分の端点である
+    michi[i].pointQ.michiB = -1;    // 端点であるため、こっちはなし
+    
+    michi[i].id = i+1;   // 線分のidは1からはじまる
   }
 
   // 始点と終点のデータを読み取り、始点終点の構造体に格納
@@ -120,25 +129,22 @@ int main() {
     scanf("%d",&s_e[i].enigma);
   }
 
-
   /* 交差地点を探し出す部分 */
   // 全ての線分の組み合わせについて、交差地点を調べる
   for(i = 0; i < (m - 1); i++) {
     for(j = i+1; j < m; j++) {
       tmpCrossing = detectCrossing(michi, i, j);
       if( (tmpCrossing.x != -1) && (tmpCrossing.y != -1) ){
-	crossing[index].point = tmpCrossing;
-	crossing[index].michiA = michi[i].id;  // 線分Aの交点である
-	crossing[index].michiB = michi[j].id;  // 線分Bの交点である
+	crossing[index] = tmpCrossing;
 	index++;
       }
     }
   }
 
   /* ソート */
-  sortCrossing(crossing, index);  // ソートする関数を別に作った
+  sortCrossing(crossing, index, n);  // ソートする関数を別に作った
 
-  // 交差地点をそれぞれの線分構造体の交点に格納
+  /* 交差地点をそれぞれの線分構造体の交点に格納 */
   for(i = 0; i < index; i++) {
     // 線分Aについて
     roadid = crossing[i].michiA - 1;
@@ -155,15 +161,53 @@ int main() {
     printf("線分id:%d, 交点の数:%d\n", i+1, crossCount[i]);
   }
 
-  // 辺をつくる
+  /* 辺をつくる */
+  // それぞれ線分について、端点Pから交点、そしてQまで辺をつくる
   for(i = 0; i < m; i++) {
-    // それぞれ線分について、端点Pから交点、そしてQまで辺をつくる
-    
+    // 辺は重みを持っている（距離）
+    roadid = michi[i].id - 1;
+    if(crossCount[roadid] != 0) {  // 線分上に交差地点があるなら
+      // 端点Pから最初の交差地点までの辺
+      idP = michi[i].pointP.id;
+      idQ = michi[i].pointQ.id;
+      idCross = michi[i].cross[0].id;
+      printf("P:%d, Q: %d\n", idP, idQ);
+      printf("crossid: %d\n", idCross);
+      
+      edge[idP][idCross] =
+	calcDistance(michi[i].pointP, michi[i].cross[0]);
+      // 線分上の交差地点の間の辺をつくる
+      lastCrossIndex = crossCount[michi[i].id - 1] - 1;
+      for(j = 1; j <= lastCrossIndex; j++) {
+	idCross = michi[i].cross[j].id;
+	idCrossNext = michi[i].cross[j+1].id;
+	edge[idCross][idCrossNext] =
+	  calcDistance(michi[i].cross[j], michi[i].cross[j+1]);
+      }
+      // 最後の交差地点から端点Qまでの辺
+      idCross = michi[i].cross[lastCrossIndex].id;
+      edge[idCross][idQ] =
+	calcDistance(michi[i].cross[lastCrossIndex], michi[i].pointQ);
+    }
   }
 
-  // 交差地点の表示
+  // 辺の重みの表示するテスト
+  for(i = 0; i < 10; i++) {
+    for(j = 0; j < 10; j++) {
+      printf("(%d, %d): %f\n", i, j, edge[i][j]);
+    }
+  }
+
+  /* 交差地点の表示 */
   for(i = 0; i < index; i++) {
-    printf("%f %f %d %d\n", crossing[i].point.x, crossing[i].point.y, crossing[i].michiA, crossing[i].michiB);
+    printf("%f %f %d %d\n", crossing[i].x, crossing[i].y, crossing[i].michiA, crossing[i].michiB);
+  }
+
+  // 辺の重みの表示するテスト
+  for(i = 0; i < 10; i++) {
+    for(j = 0; j < 10; j++) {
+      printf("(%d, %d): %f\n", i, j, edge[i][j]);
+    }
   }
   
   //始点終点テストの実行
@@ -178,7 +222,7 @@ t_point detectCrossing(t_road* michi, int roadNumberA, int roadNumberB) {
   double x, y;
   double determinant;
   t_point crossing;
-  t_point notExist = {-1, -1};
+  t_point notExist = {-1, -1, -1, -1, -1};
   double p1X, p1Y, q1X, q1Y, p2X, p2Y, q2X, q2Y;
   int i, index;
 
@@ -219,6 +263,8 @@ t_point detectCrossing(t_road* michi, int roadNumberA, int roadNumberB) {
 
     crossing.x = x;
     crossing.y = y;
+    crossing.michiA = roadNumberA + 1;   // この交差地点は線分A と 線分Bが交差したものであること
+    crossing.michiB = roadNumberB + 1;   // を記録(線分Aのidと線分Bのid)
 
     return crossing;
   }
@@ -229,7 +275,7 @@ t_point detectCrossing(t_road* michi, int roadNumberA, int roadNumberB) {
 }
 
 // 交差地点をソートする関数
-void sortCrossing(t_crossing* crossing, int index) {
+void sortCrossing(t_point* crossing, int index, int n) {
   int i, j;
   t_point tmpPoint;
   int newid;
@@ -238,27 +284,27 @@ void sortCrossing(t_crossing* crossing, int index) {
   for(i = 0; i < (index - 1); i++) {
     for(j = (index - 1); j > i; j--) {
       // x座標の小さい順に並べる
-      if(crossing[j-1].point.x > crossing[j].point.x) {
-	tmpPoint = crossing[j-1].point;
-	crossing[j-1].point = crossing[j].point;
-	crossing[j].point = tmpPoint;
+      if(crossing[j-1].x > crossing[j].x) {
+	tmpPoint = crossing[j-1];
+	crossing[j-1] = crossing[j];
+	crossing[j] = tmpPoint;
       }
       // x座標が同じ交差地点だった場合
-      if( (fabs(crossing[j-1].point.x - crossing[j].point.x) <= EPS) ) {
+      if( (fabs(crossing[j-1].x - crossing[j].x) <= EPS) ) {
 	// y座標がより小さい順に並べる
-	if(crossing[j-1].point.y > crossing[j].point.y) {
-	  tmpPoint = crossing[j-1].point;
-	  crossing[j-1].point = crossing[j].point;
-	  crossing[j].point = tmpPoint;
+	if(crossing[j-1].y > crossing[j].y) {
+	  tmpPoint = crossing[j-1];
+	  crossing[j-1] = crossing[j];
+	  crossing[j] = tmpPoint;
 	}
       }
     }
   }
 
-  // idを更新(全ての線分の端点のidの後に、交点のidが続く) ex) 1, 2, 3, C1(4), C2(5), ...
-  newid = index+1;  // 交点のidは最後の線分の端点のidの次から始まる
+  // idを更新(全ての入力した座標のidの後に、交点のidが続く) ex) 1, 2, 3, C1(4), C2(5), ...
+  newid = n+1;  // 交点のidは最後の入力した座標のidの次から始まる
   for(i = 0; i < index; i++) {
-    crossing[i].point.id = newid;  // C1, C2, ....
+    crossing[i].id = newid;  // C1, C2, ....
     newid++;
   }
 
@@ -299,3 +345,15 @@ void Test_start_end(start_end* se, int q){
   printf("--------------------------------------\n\n");
 }
   
+// 指定された座標間の距離を出す
+double calcDistance(t_point pointA, t_point pointB) {
+  double distance;
+
+  // ピタゴラスの定理
+  distance = pow( ((pointA.x - pointB.x)*(pointA.x - pointB.x)
+		   + (pointA.y - pointB.y)*(pointA.y - pointB.y)), 0.5 );
+
+  printf("distance: %f\n", distance);
+
+  return distance;
+}
