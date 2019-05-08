@@ -1,8 +1,6 @@
 /* s1250183 */
 /* 小課題3の関数部分の実装 */
 
-/* 最短距離を求める関数に始点と終点の座標を渡すために構造体を用意しました。　*/
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
@@ -10,10 +8,11 @@
 #define CROSS 1000
 #define DIGIT 50
 
+// 座標の構造体
 typedef struct {
   double x;
   double y;
-  int id;
+  int id;      // 座標のid 
 } t_point;
 
 // 交点の構造体
@@ -27,7 +26,7 @@ typedef struct {
   t_point pointP;
   t_point pointQ;
   t_crossing cross[CROSS];  // 線分上の交点
-  int id;
+  int id;  // 道のid
 } t_road;
 
 typedef struct {
@@ -63,6 +62,9 @@ int main() {
   int roadid;
   int crossCount[CROSS];  // 各線分の交点の数を保持
 
+  int edge[CROSS][CROSS]; // 辺
+
+         /* 入力部分 */
   // 座標の数、線分の本数の入力
   scanf("%d %d %d %d", &n, &m, &p, &q);
 
@@ -118,6 +120,8 @@ int main() {
     scanf("%d",&s_e[i].enigma);
   }
 
+
+  /* 交差地点を探し出す部分 */
   // 全ての線分の組み合わせについて、交差地点を調べる
   for(i = 0; i < (m - 1); i++) {
     for(j = i+1; j < m; j++) {
@@ -131,23 +135,31 @@ int main() {
     }
   }
 
-  
-
-  /* ここにソートの実装をする */
+  /* ソート */
   sortCrossing(crossing, index);  // ソートする関数を別に作った
 
   // 交差地点をそれぞれの線分構造体の交点に格納
   for(i = 0; i < index; i++) {
+    // 線分Aについて
     roadid = crossing[i].michiA - 1;
     michi[roadid].cross[crossCount[roadid]] = crossing[i];
     crossCount[roadid]++;  // 線分構造体の中の交点の数をアップ
+    // 線分Bについて
+    roadid = crossing[i].michiB - 1;
+    michi[roadid].cross[crossCount[roadid]] = crossing[i];
+    crossCount[roadid]++;
   }
 
   // 各線分の交点の数を表示するテスト
   for(i = 0; i < m; i++) {
     printf("線分id:%d, 交点の数:%d\n", i+1, crossCount[i]);
   }
-  
+
+  // 辺をつくる
+  for(i = 0; i < m; i++) {
+    // それぞれ線分について、端点Pから交点、そしてQまで辺をつくる
+    
+  }
 
   // 交差地点の表示
   for(i = 0; i < index; i++) {
@@ -220,6 +232,7 @@ t_point detectCrossing(t_road* michi, int roadNumberA, int roadNumberB) {
 void sortCrossing(t_crossing* crossing, int index) {
   int i, j;
   t_point tmpPoint;
+  int newid;
 
   // バブルソート
   for(i = 0; i < (index - 1); i++) {
@@ -242,9 +255,11 @@ void sortCrossing(t_crossing* crossing, int index) {
     }
   }
 
-  // idを更新
+  // idを更新(全ての線分の端点のidの後に、交点のidが続く) ex) 1, 2, 3, C1(4), C2(5), ...
+  newid = index+1;  // 交点のidは最後の線分の端点のidの次から始まる
   for(i = 0; i < index; i++) {
-    crossing[i].point.id = i+1;
+    crossing[i].point.id = newid;  // C1, C2, ....
+    newid++;
   }
 
   return;
