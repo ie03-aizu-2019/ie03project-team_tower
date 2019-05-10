@@ -25,7 +25,7 @@ int main() {
   /* 入力部分 OK*/
   inputNumber(&n, &m, &p, &q);
   inputPoint(point, n);
-  inputRoad(point, road, &idP, &idQ, m);
+  inputRoad(point, road, m);
 
   /* 交差地点を探し出す部分 */
   for(i = 1; i < m; i++) {

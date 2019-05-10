@@ -4,6 +4,6 @@
 
 void inputNumber(int*, int*, int*, int*);
 void inputPoint(point_t*, int);
-void inputRoad(point_t*, int (*)[2], int*, int*, int);
+void inputRoad(point_t*, int (*)[2], int);
 
 #endif
