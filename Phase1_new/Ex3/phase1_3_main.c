@@ -1,5 +1,7 @@
+/* new version */
 #include <stdio.h>
 #include "func.h"
+#include "input.h"
 #include "point.h"
 
 #define NMAX 1000
@@ -8,7 +10,7 @@
 
 int main() {
   int n, m, p, q;
-  int idP, idQ, tmpid;
+  int idP, idQ;
   int i, j;
   int crossIndex = 0;
   int crossCount = 0;   // 交点の総数
@@ -20,43 +22,12 @@ int main() {
   point_t crossing[CROSS];
   point_t tmpPoint;
 
-  /* 入力部分 */
-  // n:座標の数, m:道の数, p:追加される地点の座標の数, q: 経路の問い合わせの数
-  scanf("%d %d %d %d", &n, &m, &p, &q);
+  /* 入力部分 OK*/
+  inputNumber(&n, &m, &p, &q);
+  inputPoint(point, n);
+  inputRoad(point, road, &idP, &idQ, m);
 
-  // 座標を入力し、座標の構造体へ格納
-  for(i = 1; i <= n; i++) {
-    scanf("%lf %lf", &point[i].x, &point[i].y);
-    point[i].id = i;     // 座標のidは1からで、point[0]は使わない
-  }
-
-  // 二つの線分の端点P, Qを入力し、P, Qそれぞれに線分の印をつける
-  for(i = 1; i <= m; i++) {
-    scanf("%d %d", &idP, &idQ);
-    // x座標が小さいほうを線分の端点Pとする
-    if(point[idP].x > point[idQ].x) {
-      tmpid = idP;
-      idP = idQ;
-      idQ = tmpid;
-    }
-    if(point[idP].x == point[idQ].x) {
-      // もしx座標が同じなら、y座標が小さいほうを線分の端点Pとする
-      if(point[idP].y > point[idQ].y) {
-	tmpid = idP;
-	idP = idQ;
-	idQ = tmpid;
-      }
-    }
-    // 道のidは1から
-    point[idP].roadA = i;   // Pは 線分id:i の端点
-    point[idQ].roadA = i;   // Qは 線分id:i の端点
-    point[idP].roadB = -1;    // Pは端点なので、一本の道にしかのっていない
-    point[idQ].roadB = -1;    // Qは端点なので、一本の道にしかのっていない
-    // 道を作成
-    road[i+1][0] = idP;
-    road[i+1][1] = idQ;
-  }
-
+  printf("\n交差地点を探すときの道の組み合わせ\n");  // 出力テスト(1)
   /* 交差地点を探し出す部分 */
   for(i = 1; i < m; i++) {
     for(j = i + 1; j <= m; j++) {
@@ -64,6 +35,9 @@ int main() {
       roadA_Q = road[i][1];
       roadB_P = road[j][0];
       roadB_Q = road[j][1];
+      // 出力テスト(1)
+      printf("roadA = P:%d Q:%d,  roadB = P:%d Q:%d\n", roadA_P, roadA_Q, roadB_P, roadB_Q);
+     
 
       tmpPoint =
 	detectCrossing(point[roadA_P], point[roadA_Q], point[roadB_P], point[roadB_Q]);
@@ -72,6 +46,7 @@ int main() {
 	crossCount++;
       }
     }
+    
   }
 
   /* xが小さい順にソート */
@@ -84,7 +59,8 @@ int main() {
     crossIndex++;
   }
 
-  // 出力テスト
+  // 出力テスト(2)
+  printf("\npointに格納された値(id:1~ )\n");
   for(i = 1; i < crossIndex; i++) {
     printf("x:%f, y:%f\n", point[i].x, point[i].y);
   }

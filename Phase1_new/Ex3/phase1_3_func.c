@@ -1,3 +1,4 @@
+/* new version */
 #include <math.h>
 #include "func.h"
 #define EPS 0.000001
