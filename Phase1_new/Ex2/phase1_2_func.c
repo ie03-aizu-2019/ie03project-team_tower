@@ -50,8 +50,6 @@ point_t detectCrossing(point_t pointP_A, point_t pointQ_A, point_t pointP_B, poi
 
     crossing.x = x;
     crossing.y = y;
-    crossing.roadA = pointP_A.roadA;  // この交差地点は線分A と 線分Bが交差したものであることを記録
-    crossing.roadB = pointP_B.roadA;
 
     return crossing;
   }
