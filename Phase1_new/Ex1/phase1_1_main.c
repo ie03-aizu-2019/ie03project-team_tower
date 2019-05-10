@@ -32,6 +32,8 @@ int main() {
     detectCrossing(point[roadA_P], point[roadA_Q], point[roadB_P], point[roadB_Q]);
       
   if( (tmpPoint.x != -1) && (tmpPoint.y != -1) ) {
+    tmpPoint.roadA = 1;
+    tmpPoint.roadB = 2;
     printf("%f %f\n", tmpPoint.x, tmpPoint.y);
   } else {
     printf("NA\n");
