@@ -1,6 +1,6 @@
 /* new version */
 #include <math.h>
-#include "func.h"
+#include "point.h"
 #define EPS 0.000001
 
 // 交差地点を返す関数, ない場合はNotExist{-1, -1}を返す
