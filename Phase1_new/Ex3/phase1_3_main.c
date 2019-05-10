@@ -10,7 +10,6 @@
 
 int main() {
   int n, m, p, q;
-  int idP, idQ;
   int i, j;
   int crossIndex = 0;
   int crossCount = 0;   // 交点の総数
@@ -25,7 +24,7 @@ int main() {
   /* 入力部分 OK*/
   inputNumber(&n, &m, &p, &q);
   inputPoint(point, n);
-  inputRoad(point, road, &idP, &idQ, m);
+  inputRoad(point, road, m);
 
   printf("\n交差地点を探すときの道の組み合わせ\n");  // 出力テスト(1)
   /* 交差地点を探し出す部分 */

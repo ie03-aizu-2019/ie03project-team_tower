@@ -20,36 +20,37 @@ void inputPoint(point_t *point, int n) {
   return;
 }
 
-void inputRoad(point_t *point, int road[][2], int* idP, int* idQ, int m) {
+void inputRoad(point_t *point, int road[][2], int m) {
   int i;
   int tmpid;
+  int idP, idQ;
 
   for(i = 1; i <= m; i++) {
-    scanf("%d %d", idP, idQ);
+    scanf("%d %d", &idP, &idQ);
     // x座標が小さいほうを線分の端点Pとする
-    if(point[*idP].x == point[*idQ].x) {
-      tmpid = *idP;
-      *idP = *idQ;
-      *idQ = tmpid;
+    if(point[idP].x == point[idQ].x) {
+      tmpid = idP;
+      idP = idQ;
+      idQ = tmpid;
     }
-    if(point[*idP].x == point[*idQ].x) {
+    if(point[idP].x == point[idQ].x) {
       // もしx座標が同じなら、y座標が小さいほうを線分の端点Pとする
-      if(point[*idP].y > point[*idQ].y) {
-	tmpid = *idP;
-	*idP = *idQ;
-	*idQ = tmpid;
+      if(point[idP].y > point[idQ].y) {
+	tmpid = idP;
+	idP = idQ;
+	idQ = tmpid;
       }
     }
 
     // 道のidは1から
-    point[*idP].roadA = i;   // Pは 線分id:i の端点
-    point[*idQ].roadA = i;   // Qは 線分id:i の端点
-    point[*idP].roadB = -1;    // Pは端点なので、一本の道にしかのっていない
-    point[*idQ].roadB = -1;    // Qは端点なので、一本の道にしかのっていない
+    point[idP].roadA = i;   // Pは 線分id:i の端点
+    point[idQ].roadA = i;   // Qは 線分id:i の端点
+    point[idP].roadB = -1;    // Pは端点なので、一本の道にしかのっていない
+    point[idQ].roadB = -1;    // Qは端点なので、一本の道にしかのっていない
 
     // 道を作成
-    road[i][0] = *idP;
-    road[i][1] = *idQ;
+    road[i][0] = idP;
+    road[i][1] = idQ;
   }
 
   return;
