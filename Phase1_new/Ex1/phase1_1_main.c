@@ -21,7 +21,7 @@ int main() {
   /* 入力部分 */
   inputNumber(&n, &m, &p, &q);
   inputPoint(point, n);
-  inputRoad(point, road, &idP, &idQ, m);
+  inputRoad(point, road, m);
 
   roadA_P = road[1][0];
   roadA_Q = road[1][1];
