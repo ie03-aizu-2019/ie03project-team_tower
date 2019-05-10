@@ -1,8 +1,9 @@
 /* new version */
 #include <stdio.h>
-#include "func.h"
-#include "input.h"
 #include "point.h"
+#include "input.h"
+#include "func.h"
+#include "func_shortest.h"
 
 #define NMAX 1000
 #define MMAX 500
@@ -21,12 +22,13 @@ int main() {
   point_t crossing[CROSS];
   point_t tmpPoint;
 
+  double edge[NMAX][NMAX];  // 辺: 中身は座標間の距離
+
   /* 入力部分 OK*/
   inputNumber(&n, &m, &p, &q);
   inputPoint(point, n);
   inputRoad(point, road, m);
 
-  printf("\n交差地点を探すときの道の組み合わせ\n");  // 出力テスト(1)
   /* 交差地点を探し出す部分 */
   for(i = 1; i < m; i++) {
     for(j = i + 1; j <= m; j++) {
@@ -34,18 +36,16 @@ int main() {
       roadA_Q = road[i][1];
       roadB_P = road[j][0];
       roadB_Q = road[j][1];
-      // 出力テスト(1)
-      printf("roadA = P:%d Q:%d,  roadB = P:%d Q:%d\n", roadA_P, roadA_Q, roadB_P, roadB_Q);
-     
 
       tmpPoint =
 	detectCrossing(point[roadA_P], point[roadA_Q], point[roadB_P], point[roadB_Q]);
       if( (tmpPoint.x != -1) && (tmpPoint.y != -1) ) {
 	crossing[crossCount] = tmpPoint;
+	crossing[crossCount].roadA = i;    // 交差地点は道iの上にある
+	crossing[crossCount].roadB = j;    // 交差地点は道jの上にある
 	crossCount++;
       }
     }
-    
   }
 
   /* xが小さい順にソート */
@@ -57,12 +57,25 @@ int main() {
     point[crossIndex] = crossing[i];
     crossIndex++;
   }
+  crossIndex = crossing[0].id;   // n + 1
 
   // 出力テスト(2)
   printf("\npointに格納された値(id:1~ )\n");
-  for(i = 1; i < crossIndex; i++) {
-    printf("x:%f, y:%f\n", point[i].x, point[i].y);
+  for(i = 1; i < (crossIndex + crossCount); i++) {
+    printf("%d x:%f, y:%f roadA:%d, roadB: %d\n", point[i].id, point[i].x, point[i].y, point[i].roadA, point[i].roadB);
   }
+
+  // 辺をつくる
+  generateEdge(edge, point, road, m, crossIndex, crossCount);
+
+  printf("\n座標間の距離\n");
+  // 辺の出力テスト
+  for(i = 1; i < (crossIndex + crossCount); i++) {
+    for(j = 1; j < (crossIndex + crossCount); j++) {
+      if(edge[i][j] != 0) printf("%d %d: %f\n", i, j, edge[i][j]);
+    }
+  }
+  
   
   return 0;
 }
