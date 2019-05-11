@@ -7,8 +7,8 @@
 
 extern void generateEdge(double (*)[NMAX], point_t*,
 			 int (*)[2], int, int, int);
-
 extern double calcDistance(point_t, point_t);
+extern double searchShortestPath(point_t*, double (*)[NMAX], int);
 
 #endif
 

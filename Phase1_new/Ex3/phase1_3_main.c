@@ -14,6 +14,9 @@ int main() {
   int i, j;
   int crossIndex = 0;
   int crossCount = 0;   // 交点の総数
+  
+  int startid, goalid;
+  int numberOfPoint;
 
   int road[MMAX+1][2];  // 0: 端点Pのid, 1: 端点Qのid
   int roadA_P, roadA_Q, roadB_P, roadB_Q;  // 道Aの端点Pのid, 道Aの端点Qのid, 道Bも同様
@@ -57,25 +60,21 @@ int main() {
     point[crossIndex] = crossing[i];
     crossIndex++;
   }
-  crossIndex = crossing[0].id;   // n + 1
-
-  // 出力テスト(2)
-  printf("\npointに格納された値(id:1~ )\n");
-  for(i = 1; i < (crossIndex + crossCount); i++) {
-    printf("%d x:%f, y:%f roadA:%d, roadB: %d\n", point[i].id, point[i].x, point[i].y, point[i].roadA, point[i].roadB);
-  }
+  numberOfPoint = n + crossCount;  // 全ての座標の数
 
   // 辺をつくる
-  generateEdge(edge, point, road, m, crossIndex, crossCount);
+  generateEdge(edge, point, road, m, n, crossCount);
 
   printf("\n座標間の距離\n");
   // 辺の出力テスト
-  for(i = 1; i < (crossIndex + crossCount); i++) {
-    for(j = 1; j < (crossIndex + crossCount); j++) {
+  for(i = 1; i <= numberOfPoint; i++) {
+    for(j = 1; j <= numberOfPoint; j++) {
       if(edge[i][j] != 0) printf("%d %d: %f\n", i, j, edge[i][j]);
     }
   }
-  
+
+  /* 最短経路探索 */
+  searchShortestPath(point, edge, numberOfPoint);
   
   return 0;
 }
