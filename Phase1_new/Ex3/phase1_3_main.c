@@ -8,6 +8,7 @@
 #define NMAX 1000
 #define MMAX 500
 #define CROSS 1000
+#define QMAX 100
 
 int main() {
   int n, m, p, q;
@@ -15,7 +16,7 @@ int main() {
   int crossIndex = 0;
   int crossCount = 0;   // 交点の総数
   
-  int startid, goalid;
+  int startid[QMAX], goalid[QMAX];
   int numberOfPoint;
 
   int road[MMAX+1][2];  // 0: 端点Pのid, 1: 端点Qのid
@@ -27,10 +28,11 @@ int main() {
 
   double edge[NMAX][NMAX];  // 辺: 中身は座標間の距離
 
-  /* 入力部分 OK*/
+  /* 入力部分 */
   inputNumber(&n, &m, &p, &q);
   inputPoint(point, n);
   inputRoad(point, road, m);
+  inputPath(startid, goalid, q, n);
 
   /* 交差地点を探し出す部分 */
   for(i = 1; i < m; i++) {
