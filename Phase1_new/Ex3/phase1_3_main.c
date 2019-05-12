@@ -18,6 +18,7 @@ int main() {
   
   int startid[QMAX], goalid[QMAX];
   int numberOfPoint;
+  double shortestDistance;
 
   int road[MMAX+1][2];  // 0: 端点Pのid, 1: 端点Qのid
   int roadA_P, roadA_Q, roadB_P, roadB_Q;  // 道Aの端点Pのid, 道Aの端点Qのid, 道Bも同様
@@ -26,8 +27,8 @@ int main() {
   point_t crossing[CROSS];
   point_t tmpPoint;
 
-  double edge[NMAX][NMAX];  // 辺: 中身は座標間の距離
-
+  double edge[NMAX][NMAX] = {0};  // 辺: 中身は座標間の距離
+  
   /* 入力部分 */
   inputNumber(&n, &m, &p, &q);
   inputPoint(point, n);
@@ -67,16 +68,16 @@ int main() {
   // 辺をつくる
   generateEdge(edge, point, road, m, n, crossCount);
 
-  printf("\n座標間の距離\n");
-  // 辺の出力テスト
-  for(i = 1; i <= numberOfPoint; i++) {
-    for(j = 1; j <= numberOfPoint; j++) {
-      if(edge[i][j] != 0) printf("%d %d: %f\n", i, j, edge[i][j]);
+  printf("\n最短経路\n");
+  /* 最短経路探索 */
+  for(i = 0; i < q; i++) {
+    shortestDistance = searchShortestPath(point, edge, numberOfPoint, startid[i], goalid[i]);
+    if(shortestDistance == -1) {
+      printf("NA\n");
+    } else {
+      printf("%f\n", shortestDistance);
     }
   }
-
-  /* 最短経路探索 */
-  searchShortestPath(point, edge, numberOfPoint);
   
   return 0;
 }

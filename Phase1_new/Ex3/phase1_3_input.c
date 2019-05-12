@@ -77,7 +77,7 @@ void inputRoad(point_t *point, int road[][2], int m) {
  * 最短経路の起点と終点を入力する関数
  * 引数1: 起点のidの配列,  引数2: 終点のidの配列, 
  * 引数3: 経路の問い合わせの数, 引数4: 入力した座標の数 
- * 返り値: 最短経路のコスト（距離）                
+ * 返り値: なし                
  */
 void inputPath(int *startid, int *goalid, int q, int n) {
   char point_c[DIGIT];
