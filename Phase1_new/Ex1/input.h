@@ -2,8 +2,8 @@
 #ifndef INPUT_H
 #define INPUT_H
 
-void inputNumber(int*, int*, int*, int*);
-void inputPoint(point_t*, int);
-void inputRoad(point_t*, int (*)[2], int);
+extern void inputNumber(int*, int*, int*, int*);
+extern void inputPoint(point_t*, int);
+extern void inputRoad(point_t*, int (*)[2], int);
 
 #endif
