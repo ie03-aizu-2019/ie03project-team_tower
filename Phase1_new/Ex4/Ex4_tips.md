@@ -5,4 +5,4 @@ Ex4のファイル内で、
  gcc *.c -lm -o phase1_4  
 
 ### 実行  
-./phase1_4  
+./phase1_4 < test.txt  
