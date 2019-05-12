@@ -79,6 +79,7 @@ double searchShortestPath(point_t *point, double edge[][NMAX], int numberOfPoint
 
   if( ((startid > numberOfPoint) || (startid < 1)) || ((goalid > numberOfPoint) || (goalid < 1)) ) {
     shortestDistance = -1;
+    printf("NA\n");
     return shortestDistance;
   }
 
@@ -136,11 +137,7 @@ double searchShortestPath(point_t *point, double edge[][NMAX], int numberOfPoint
   shortestDistance = processPoint.cost;
 
   // 最短経路の距離表示
-  if(shortestDistance == -1) {
-      printf("NA\n");
-    } else {
-      printf("%f\n", shortestDistance);
-  }
+  printf("%f\n", shortestDistance);
 
   // 経路を記録
   pathid = goalid;
