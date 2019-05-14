@@ -4,6 +4,7 @@
 #include "input.h"
 #include "func.h"
 #include "func_shortest.h"
+#include "test.h"
 
 #define NMAX 1000
 #define MMAX 500
@@ -56,7 +57,7 @@ int main() {
 
   /* xが小さい順にソート */
   sortCrossing(crossing, crossCount, n);
-
+  
   // 交差地点を座標の構造体配列へ格納
   crossIndex = crossing[0].id;
   for(i = 0; i < crossCount; i++) {
@@ -68,10 +69,16 @@ int main() {
   // 辺をつくる
   generateEdge(edge, point, road, m, n, crossCount);
 
+  /* テスト出力 */
+  outputPoint(point, n);
+  outputRoad(road, m);
+  outputEdge(edge, point, road, m, n, crossCount);
+
   printf("\n最短経路\n");
   /* 最短経路探索 */
   for(i = 0; i < q; i++) {
-    shortestDistance = searchShortestPath(point, edge, numberOfPoint, startid[i], goalid[i]);
+    shortestDistance = searchShortestPath(point, edge,
+					  numberOfPoint, startid[i], goalid[i]);
   }
   
   return 0;
