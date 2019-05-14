@@ -22,7 +22,7 @@ int main() {
   point_t crossing[CROSS];
   point_t tmpPoint;
 
-  /* 入力部分 OK*/
+  /* 入力部分 */
   inputNumber(&n, &m, &p, &q);
   inputPoint(point, n);
   inputRoad(point, road, m);
