@@ -7,6 +7,20 @@
 #define INF 10000000
 
 /*
+ * 座標のidを受け取り、そのidの座標のインデックスを返す関数
+ * 引数1: 座標, 引数2: 全座標の数, 引数3:　座標のid
+ * 返り値: 受け取った座標idのインデックス
+ */
+int searchPointIndex(point_t* point, int numberOfPoint, int id) {
+  int i;
+
+  for(i = 1; i <= numberOfPoint; i++) {
+    if(point[i].id == id) return i;
+  }
+  return -1;
+}
+
+/*
  * 二つの座標間の距離を返す関数
  * 引数1: 一つ目の座標, 引数2: 二つ目の座標
  * 返り値: 二点間の距離
@@ -31,19 +45,19 @@ void generateEdge(double edge[][NMAX], point_t* point,
   int i, j;
   int numberOfPoint = n + crossCount;
   int idFrom, idTo;
-  int crossing_id[CROSS];
 
   // idが1の道から辺をつくる
   for(i = 1; i <= m; i++) {
     //　道i上にある交差地点をみつける
     idFrom = road[i][0];    // 最初は端点Pのid
     for(j = n + 1; j <= numberOfPoint; j++) {
-      // 交差地点の中で、道i上にあるものだったら
-      if((point[j].roadA == i) || (point[j].roadB == i)) {
-	idTo = j;             // 交点のid
-	edge[idFrom][idTo] = calcDistance(point[idFrom], point[idTo]);
-	edge[idTo][idFrom] = edge[idFrom][idTo];   // 双方向
-	idFrom = idTo;      // 次へ
+      if( (point[j].roadA == i) || (point[j].roadB == i) ) {
+	idTo = point[j].id;
+	if(idTo != idFrom) {
+	  edge[idFrom][idTo] = calcDistance(point[idFrom], point[idTo]);
+	  edge[idTo][idFrom] = edge[idFrom][idTo];
+	}
+	idFrom = idTo;
       }
     }
     // 最後の交点と端点Qの間の辺
@@ -74,8 +88,12 @@ double searchShortestPath(point_t *point, double edge[][NMAX], int numberOfPoint
   int pathid;
   
   int i, j;
+  int indexFori, indexForj;
 
-  if( ((startid > numberOfPoint) || (startid < 1)) || ((goalid > numberOfPoint) || (goalid < 1)) ) {
+  int testCounter = 0;
+
+  // 最後の座標のidよりも大きかったらエラー or 1 より小さかったらエラー
+  if( ((startid > point[numberOfPoint].id) || (startid < 1)) || ((goalid > point[numberOfPoint].id) || (goalid < 1)) ) {
     shortestDistance = -1;
     printf("NA\n");
     return shortestDistance;
@@ -89,9 +107,11 @@ double searchShortestPath(point_t *point, double edge[][NMAX], int numberOfPoint
   for(i = 1; i <= numberOfPoint; i++) {
     for(j = 1; j <= numberOfPoint; j++) {
       // 重みつきの辺が存在していたならば
-      if(edge[i][j] != 0) {
-	point[i].done = 0;
-	point[j].done = 0;
+      indexFori = searchPointIndex(point, numberOfPoint, i);
+      indexForj = searchPointIndex(point, numberOfPoint, j);
+      if(edge[indexFori][indexForj] != 0) {
+	point[indexFori].done = 0;
+	point[indexForj].done = 0;
       }
     }
   }
@@ -103,9 +123,10 @@ double searchShortestPath(point_t *point, double edge[][NMAX], int numberOfPoint
     point[i].cost = INF;
   }
   // 始点だけはコストが0
-  point[startid].cost = 0;
-  processPoint = point[startid];
-  point[startid].done++;
+  indexFori = searchPointIndex(point, numberOfPoint, startid);
+  point[indexFori].cost = 0;
+  processPoint = point[indexFori];
+  point[indexFori].done++;
   
   while(processPoint.id != goalid) {
     // processNodeにつながるノードのコストを更新
@@ -115,19 +136,21 @@ double searchShortestPath(point_t *point, double edge[][NMAX], int numberOfPoint
 	newCost = processPoint.cost + edge[processPoint.id][i];
 	// コストの更新(問題)
 	if(newCost < point[i].cost) {
-	  point[i].cost = newCost;
-	  point[i].prePointid = processPoint.id;
+	  indexFori = searchPointIndex(point, numberOfPoint, i);
+	  point[indexFori].cost = newCost;
+	  point[indexFori].prePointid = processPoint.id;
 	}
       }
     }
     // 訪れていないノードの中でコストがもっとも低いノードを訪れる
     tmpPoint.cost = INF;
     for(i = 1; i <= numberOfPoint; i++) {
-      if(point[i].done == 0) {
+      indexFori = searchPointIndex(point, numberOfPoint, i);
+      if(point[indexFori].done == 0) {
 	// 最小のコスト
-        if(tmpPoint.cost > point[i].cost) {
-	  tmpPoint = point[i];
-	  minCostIndex = i;
+        if(tmpPoint.cost > point[indexFori].cost) {
+	  tmpPoint = point[indexFori];
+	  minCostIndex = indexFori;
 	}
       }
     }
@@ -140,7 +163,7 @@ double searchShortestPath(point_t *point, double edge[][NMAX], int numberOfPoint
   printf("%f\n", shortestDistance);
 
   /* 経路を記録 */
-  pathid = goalid;
+  pathid = searchPointIndex(point, numberOfPoint, goalid);
   while(pathid != startid) {
     shortestPath[shortestPathIndex] = point[pathid].id;
     shortestPathIndex++;
@@ -158,3 +181,4 @@ double searchShortestPath(point_t *point, double edge[][NMAX], int numberOfPoint
   
   return shortestDistance;
 }
+

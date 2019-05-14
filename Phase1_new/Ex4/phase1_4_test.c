@@ -13,7 +13,8 @@ void outputPoint(point_t* point, int n) {
   
   printf("~ point list ~\n");
   for(i = 1; i <= n; i++) {
-    printf("point %d: %f, %f\n", point[i].id, point[i].x, point[i].y);
+    printf("point %d: x %f y %f, roadA %d, roadB %d\n", point[i].id, point[i].x, point[i].y,
+	   point[i].roadA, point[i].roadB);
   }
 
   return;
@@ -70,9 +71,11 @@ void outputEdge(double edge[][NMAX], point_t* point, int road[][2], int m, int n
   for(i = 1; i <= m; i++) {
     idFrom = road[i][0];    // 最初は端点Pのid
     for(j = n + 1; j <= numberOfPoint; j++) {
-      if((point[j].roadA == i) || (point[j].roadB == i)) {
-	idTo = j;
-	printf("%d -> %d, ", idFrom, idTo);
+      if( (point[j].roadA == i) || (point[j].roadB == i) ) {
+	idTo = point[j].id;
+	if(idTo != idFrom) {
+	  printf("%d -> %d, ", idFrom, idTo);
+	}
 	idFrom = idTo;
       }
     }

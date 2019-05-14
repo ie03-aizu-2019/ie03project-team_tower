@@ -55,7 +55,9 @@ int main() {
   }
 
   for(i = crossing[0].id; i < crossIndex; i++) {
-    printf("%f %f\n", point[i].x, point[i].y);
+    if( point[i].id != point[i-1].id ) {
+      printf("%f %f\n", point[i].x, point[i].y);
+    }
   }
   
   return 0;

@@ -74,6 +74,9 @@ int main() {
   outputRoad(road, m);
   outputEdge(edge, point, road, m, n, crossCount);
 
+  // この場合どうすればいいのか
+  // printf("edge(4,12): %f, edge(4,14): %f\n", edge[12][4], edge[4][14]);
+
   printf("\n最短経路\n");
   /* 最短経路探索 */
   for(i = 0; i < q; i++) {
