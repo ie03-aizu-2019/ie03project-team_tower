@@ -70,7 +70,7 @@ int main() {
   generateEdge(edge, point, road, m, n, crossCount);
 
   /* テスト出力 */
-  outputPoint(point, n);
+  outputPoint(point, numberOfPoint);
   outputRoad(road, m);
   outputEdge(edge, point, road, m, n, crossCount);
 

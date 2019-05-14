@@ -23,7 +23,7 @@ point_t detectCrossing(point_t pointP_A, point_t pointQ_A, point_t pointP_B, poi
   q2Y = pointQ_B.y;
 
   // 行列式を求める
-  determinant = ( (q1X - p1X)*(p2Y - q2Y) + (q2X - p2X)*(q1Y - p1Y) );
+  determinant = fabs(( (q1X - p1X)*(p2Y - q2Y) + (q2X - p2X)*(q1Y - p1Y) ));
 
   // Step1
   if( (determinant <= EPS) && (determinant >= EPS) ) {
