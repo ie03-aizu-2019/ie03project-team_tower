@@ -8,7 +8,7 @@ typedef struct {
   int roadB;
   double cost;    // コスト
   int done;    // 訪問済みのフラグ
-  int preNode; // 最短経路として選択された自身の前のノード
+  int prePointid; // 最短経路として選択された自身の前のノード
   int id;
 } point_t;
 

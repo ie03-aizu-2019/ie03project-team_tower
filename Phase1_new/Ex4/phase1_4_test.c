@@ -15,6 +15,8 @@ void outputPoint(point_t* point, int n) {
   for(i = 1; i <= n; i++) {
     printf("point %d: %f, %f\n", point[i].id, point[i].x, point[i].y);
   }
+
+  return;
 }
 
 
@@ -31,6 +33,8 @@ void outputRoad(int road[][2], int m) {
   for(i = 1; i <= m; i++) {
     printf("road %d: P %d, Q %d\n", i, road[i][0], road[i][1]);
   }
+  
+  return;
 }
 
 /* 
@@ -46,6 +50,8 @@ void outputCrossing(point_t* crossing, int crossCount) {
   for(i = 0; i < crossCount; i++) {
     printf("crossing %d: %f, %f\n", crossing[i].id, crossing[i].x, crossing[i].y);
   }
+
+  return;
 }
 
 /* 

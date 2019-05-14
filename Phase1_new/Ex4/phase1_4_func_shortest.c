@@ -96,7 +96,7 @@ double searchShortestPath(point_t *point, double edge[][NMAX], int numberOfPoint
     }
   }
 
-  // ダイクストラ法
+  /* ダイクストラ法 */
   // https://www.youtube.com/watch?v=gdmfOwyQlcI
   // 全てのノードのコストを大きな数字で初期化
   for(i = 1; i <= numberOfPoint; i++) {
@@ -114,7 +114,10 @@ double searchShortestPath(point_t *point, double edge[][NMAX], int numberOfPoint
       if(edge[processPoint.id][i] != 0) {
 	newCost = processPoint.cost + edge[processPoint.id][i];
 	// コストの更新(問題)
-	if(newCost < point[i].cost) point[i].cost = newCost;
+	if(newCost < point[i].cost) {
+	  point[i].cost = newCost;
+	  point[i].prePointid = processPoint.id;
+	}
       }
     }
     // 訪れていないノードの中でコストがもっとも低いノードを訪れる
@@ -128,7 +131,6 @@ double searchShortestPath(point_t *point, double edge[][NMAX], int numberOfPoint
 	}
       }
     }
-    
     processPoint = tmpPoint;
     point[minCostIndex].done++;
   }
@@ -137,27 +139,15 @@ double searchShortestPath(point_t *point, double edge[][NMAX], int numberOfPoint
   // 最短経路の距離表示
   printf("%f\n", shortestDistance);
 
-  // 経路を記録
+  /* 経路を記録 */
   pathid = goalid;
-  // ゴールノードから、つながるノードのうち訪問済み かつ コストが小さいほうを選ぶ
-  // 探索と同時に記録するのがベストだが、今はこのやり方
   while(pathid != startid) {
-    shortestPath[shortestPathIndex] = pathid;
+    shortestPath[shortestPathIndex] = point[pathid].id;
     shortestPathIndex++;
-    tmpPoint.cost = INF;
-    
-    for(i = 1; i <= numberOfPoint; i++) {
-      if( (edge[pathid][i] != 0) && (point[i].done != 0) ) {
-	if(point[i].cost < tmpPoint.cost) {
-	  tmpPoint = point[i];
-	  minCostIndex = i;
-	}
-      }
-    }
-    pathid = minCostIndex;
+    pathid = point[pathid].prePointid;
   }
   // 最後にスタートノードを経由地点に入れる
-  shortestPath[shortestPathIndex] = pathid;
+  shortestPath[shortestPathIndex] = point[pathid].id;
   shortestPathIndex++;
 
   // 経路表示
