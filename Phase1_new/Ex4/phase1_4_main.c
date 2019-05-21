@@ -78,7 +78,7 @@ int main() {
   /* 最短経路探索 */
   for(i = 0; i < q; i++) {
     shortestDistance = searchShortestPath(point, edge,
-					  numberOfPoint, startid[i], goalid[i]);
+					  numberOfPoint, startid[i], goalid[i], crossCount);
   }
   
   return 0;
