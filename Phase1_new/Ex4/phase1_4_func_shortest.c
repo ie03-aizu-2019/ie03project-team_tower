@@ -89,6 +89,7 @@ double searchShortestPath(point_t *point, double edge[][NMAX], int numberOfPoint
   
   int i, j;
   int indexFori, indexForj;
+  int idFori;
 
   int testCounter = 0;
 
@@ -102,6 +103,7 @@ double searchShortestPath(point_t *point, double edge[][NMAX], int numberOfPoint
   // 初期化
   for(i = 1; i <= numberOfPoint; i++) {
     point[i].done = 1;
+    point[i].prePointid = INF;  // 同じ距離の場合に辞書順に並べるため
   }
 
   for(i = 1; i <= numberOfPoint; i++) {
@@ -132,16 +134,27 @@ double searchShortestPath(point_t *point, double edge[][NMAX], int numberOfPoint
     // processNodeにつながるノードのコストを更新
     for(i = 1; i <= numberOfPoint; i++) {
       // 辺が存在していたら(つながっていたら)
-      if(edge[processPoint.id][i] != 0) {
-	newCost = processPoint.cost + edge[processPoint.id][i];
-	// コストの更新(問題)
-	if(newCost < point[i].cost) {
-	  indexFori = searchPointIndex(point, numberOfPoint, i);
-	  point[indexFori].cost = newCost;
+      idFori = point[i].id;
+      if(edge[processPoint.id][idFori] != 0) {
+	newCost = processPoint.cost + edge[processPoint.id][idFori];
+	// コストの更新
+	indexFori = searchPointIndex(point, numberOfPoint, i);
+	if(newCost < point[indexFori].cost) {
+ 	  point[indexFori].cost = newCost;
 	  point[indexFori].prePointid = processPoint.id;
+	}
+	  // 同じ距離の最短経路が複数あった場合
+	if(newCost == point[indexFori].cost) {
+	  //test
+	  //printf("same %d %d\n", processPoint.id, point[indexFori].prePointid);
+	  // 辞書順
+	  if(processPoint.id < point[indexFori].prePointid) {
+	    point[indexFori].prePointid = processPoint.id;
+	  }
 	}
       }
     }
+    
     // 訪れていないノードの中でコストがもっとも低いノードを訪れる
     tmpPoint.cost = INF;
     for(i = 1; i <= numberOfPoint; i++) {
@@ -181,4 +194,3 @@ double searchShortestPath(point_t *point, double edge[][NMAX], int numberOfPoint
   
   return shortestDistance;
 }
-
