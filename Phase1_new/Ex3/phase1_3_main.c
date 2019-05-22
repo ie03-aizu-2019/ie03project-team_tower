@@ -22,7 +22,6 @@ int main() {
 
   int road[MMAX+1][2];  // 0: 端点Pのid, 1: 端点Qのid
   int roadA_P, roadA_Q, roadB_P, roadB_Q;  // 道Aの端点Pのid, 道Aの端点Qのid, 道Bも同様
-  int duplicated = 0;
 
   point_t point[NMAX+1];
   point_t crossing[CROSS];

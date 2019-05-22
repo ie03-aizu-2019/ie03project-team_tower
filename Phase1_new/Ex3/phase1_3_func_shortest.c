@@ -7,6 +7,20 @@
 #define INF 10000000
 
 /*
+ * 座標のidを受け取り、そのidの座標のインデックスを返す関数
+ * 引数1: 座標, 引数2: 全座標の数, 引数3:　座標のid
+ * 返り値: 受け取った座標idのインデックス
+ */
+int searchPointIndex(point_t* point, int numberOfPoint, int id) {
+  int i;
+
+  for(i = 1; i <= numberOfPoint; i++) {
+    if(point[i].id == id) return i;
+  }
+  return -1;
+}
+
+/*
  * 二つの座標間の距離を返す関数
  * 引数1: 一つ目の座標, 引数2: 二つ目の座標
  * 返り値: 二点間の距離
@@ -29,30 +43,26 @@ void generateEdge(double edge[][NMAX], point_t* point,
 		  int road[][2], int m, int n, int crossCount) {
   int i, j;
   int numberOfPoint = n + crossCount;
-  int idFrom, idTo, point_id;
-  int crossing_id[CROSS];
+  int idFrom, idTo;
 
-  printf("\nEdge list\n");  // test(1)
   // idが1の道から辺をつくる
   for(i = 1; i <= m; i++) {
     //　道i上にある交差地点をみつける
-    point_id = road[i][0];  // 道iの端点Pのid
-    idFrom = point_id;    // 最初は端点Pのid
+    idFrom = road[i][0];    // 最初は端点Pのid
     for(j = n + 1; j <= numberOfPoint; j++) {
-      // 交差地点の中で、道i上にあるものだったら
-      if((point[j].roadA == i) || (point[j].roadB == i)) {
-	idTo = j;             // 交点のid
-	edge[idFrom][idTo] = calcDistance(point[idFrom], point[idTo]);
-	edge[idTo][idFrom] = edge[idFrom][idTo];   // 双方向
-	printf("%d -> %d, ", idFrom, idTo);  // test(1)
-	idFrom = idTo;      // 次へ
+      if( (point[j].roadA == i) || (point[j].roadB == i) ) {
+	idTo = point[j].id;
+	if(idTo != idFrom) {
+	  edge[idFrom][idTo] = calcDistance(point[idFrom], point[idTo]);
+	  edge[idTo][idFrom] = edge[idFrom][idTo];
+	}
+	idFrom = idTo;
       }
     }
     // 最後の交点と端点Qの間の辺
     idTo = road[i][1];     // 道iの端点Qのid
     edge[idFrom][idTo] = calcDistance(point[idFrom], point[idTo]);
     edge[idTo][idFrom] = edge[idFrom][idTo];
-    printf("%d -> %d\n", idFrom, idTo);  // test(1)
   }
 
   return;

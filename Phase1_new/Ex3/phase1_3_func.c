@@ -61,9 +61,10 @@ point_t detectCrossing(point_t pointP_A, point_t pointQ_A, point_t pointP_B, poi
 
 // 交差地点をソートする関数
 void sortCrossing(point_t* crossing, int crossCount, int n) {
-  int i, j;
+  int i, j, k;
   point_t tmpPoint;
   int newid;
+  int duplicated = 0;
 
   // バブルソート
   for(i = 0; i < (crossCount - 1); i++) {
@@ -88,9 +89,26 @@ void sortCrossing(point_t* crossing, int crossCount, int n) {
 
   // idを更新(全ての入力した座標のidの後に、交点のidが続く) ex) 1, 2, 3, C1(4), C2(5), ...
   newid = n+1;  // 交点のidは最後の入力した座標のidの次から始まる
+  // idの重複を防ぐ(3本以上の道が交差している時)
   for(i = 0; i < crossCount; i++) {
-    crossing[i].id = newid;  // C1, C2, ....
+    for(j = 0; j < crossCount; j++) {
+      if( ((crossing[i].x == crossing[j].x)
+	   && (crossing[i].y == crossing[j].y)) ) {
+	duplicated++;
+      }
+    }
+
+    if(duplicated > 1) {
+      for(k = 0; k < duplicated; k++) {
+	crossing[i].id = newid;   // 重複した交差地点は同じid
+	i++;
+      }
+      i--;
+    } else {
+      crossing[i].id = newid;  // C1, C2, ....
+    }
     newid++;
+    duplicated = 0;
   }
 
   return;
