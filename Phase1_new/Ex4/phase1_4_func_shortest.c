@@ -61,10 +61,12 @@ void generateEdge(double edge[][NMAX], point_t* point,
  * 引数4: スタート座標のid, 引数5: ゴール座標のid
  * 返り値: 最短経路のコスト（距離）                
  */
-double searchShortestPath(point_t *point, double edge[][NMAX], int numberOfPoint, int startid, int goalid) {
+double searchShortestPath(point_t *point, double edge[][NMAX], int numberOfPoint, int startid, int goalid, int clossNum) {
   double shortestDistance = 0; 
   point_t processPoint;
   point_t tmpPoint;
+	
+  int notCrossing = numberOfPoint - clossNum;//交差地点以外の座標の数
 
   int minCostIndex = 0;
   double newCost;
@@ -150,9 +152,10 @@ double searchShortestPath(point_t *point, double edge[][NMAX], int numberOfPoint
   shortestPath[shortestPathIndex] = point[pathid].id;
   shortestPathIndex++;
 
-  // 経路表示
+  // 経路表示  ->Fix
   for(i = shortestPathIndex - 1; i >= 0; i--) {
-    printf("%d ", shortestPath[i]);
+	  if(shortestPath[i] > notCrossing) printf("C%d ",shortestPath[i]-notCrossing);
+	  else printf("%d ", shortestPath[i]);
   }
   printf("\n");
   
