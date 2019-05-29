@@ -1,8 +1,8 @@
-# 小課題4のプログラムについて  
+# 小課題7のプログラムについて  
 ## 実行方法  
 ### コンパイル  
-Ex4のファイル内で、  
- gcc *.c -lm -o phase1_4  
+Ex7のファイル内で、  
+ gcc *.c -lm -o phase2_7  
 
 ### 実行  
-./phase1_4 < Test1_4/test.txt  
+./phase2_7 < Test2_7/test.txt  

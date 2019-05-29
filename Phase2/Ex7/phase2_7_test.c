@@ -85,3 +85,12 @@ void outputEdge(double edge[][NMAX], point_t* point, int road[][2], int m, int n
 
   return;
 }
+
+void outputNewPoint(point_t* newPoint, int p) {
+  int i;
+
+  printf("~ NewPoint list ~\n");
+  for(i = 0; i < p; i++) {
+    printf("newPoint:i %d, x %f, y %f\n", i, newPoint[i].x, newPoint[i].y);
+  }
+}

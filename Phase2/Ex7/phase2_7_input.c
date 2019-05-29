@@ -99,3 +99,18 @@ void inputPath(int *startid, int *goalid, int q, int n) {
 
   return;
 }
+
+/* 
+ * 新しい地点を入力し、座標構造体に格納する関数
+ * 引数1: 座標, 引数2: 新しい地点の数
+ * 返り値: なし                
+ */
+void inputNewPoint(point_t* newPoint, int p) {
+  int i;
+
+  for(i = 0; i < p; i++) {
+    scanf("%lf %lf", &newPoint[i].x, &newPoint[i].y);
+  }
+
+  return;
+}
