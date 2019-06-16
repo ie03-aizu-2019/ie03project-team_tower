@@ -27,12 +27,10 @@ int searchPointIndex(point_t* point, int numberOfPoint, int id) {
  */
 point_t suggestNewRoad(point_t *point, int road[][2], int n, int m, point_t newPoint) {
   int i;
-  double tmpX;
   double x1, y1, x2, y2, x3, y3;
-  double a, b, c;  // 方程式の係数
-  double discriminant;  // 判別式
   int pointPIndex, pointQIndex;
-  
+
+  double coef1, coef2;
   double min;
   int minIndex;
 
@@ -59,41 +57,29 @@ point_t suggestNewRoad(point_t *point, int road[][2], int n, int m, point_t newP
     // x2, y2 は 線分端点Qの座標
     x2 = point[pointQIndex].x;
     y2 = point[pointQIndex].y;
-    
-    // 方程式の係数
-    a = ( ((x2 - x1)*(x2 - x1)) + ((y2 - y1)*(y2 - y1)) ) / ((x2 - x1) * (x2 - x1));
-    b = -1 * ( ( (x2 - x1)*(x3 - x1) + (y2 - y1)*(y3 - y1) ) / (x2 - x1) );
-    c = x1 * x3;
 
-    // 判別式
-    discriminant = b * b - (4 * a * c);
-    if(discriminant < 0) {
-      x[i] = INF;
-      y[i] = INF;
-      distance[i] = INF;
-      continue;
-    }
+    coef1 = pow(x2-x1, 2.0);
+    coef2 = pow(y2-y1, 2.0);
+    
     // 方程式を解く
-    tmpX = ( -b + sqrt(discriminant) ) / (2 * a);
-    printf("tmpX: %f\n", tmpX);
-    if((tmpX > x1) && (tmpX < x2)) tmpX = ( -b - sqrt(discriminant) ) / (2 * a);
-    printf("tmpX2: %f\n", tmpX);
-    x[i] = tmpX;
-    y[i] = ( ( (y2 - y1)/(x2 - x1) ) * tmpX ) + y1;
+    x[i] = (1 / (coef1 + coef2)) * ( coef1 * x3 + coef2 * x1 - (x2-x1)*(y2-y1)*(y1-y3) );
+    y[i] = ( ( (y2 - y1)/(x2 - x1) ) * (x[i] - x1) ) + y1;
     // 距離を求める
     distance[i] = sqrt(fabs( (x3 - x[i])*(x3 - x[i]) + (y3 - y[i])*(y3 - y[i]) ));
   }
 
+  /*
   // test
   for(i = 1; i <= m; i++) {
     printf("distance: %f, x: %f, y: %f\n", distance[i], x[i], y[i]);
   }
+  */
 
   // 最短距離の座標を返す
   min = INF;
   minIndex = 0;
   for(i = 1; i <= m; i++) {
-    if(min > distance[i]) {
+    if( (min > distance[i]) && (x[i] != x3) && (y[i] != y3) ) {
       min = distance[i];
       minIndex = i;
     }
