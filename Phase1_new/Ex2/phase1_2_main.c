@@ -4,9 +4,9 @@
 #include "input.h"
 #include "point.h"
 
-#define NMAX 1000
-#define MMAX 500
-#define CROSS 1000
+#define NMAX 200
+#define MMAX 100
+#define CROSS 5000
 
 int main() {
   int n, m, p, q;
@@ -18,7 +18,7 @@ int main() {
   int road[MMAX+1][2];  // 0: 端点Pのid, 1: 端点Qのid
   int roadA_P, roadA_Q, roadB_P, roadB_Q;  // 道Aの端点Pのid, 道Aの端点Qのid, 道Bも同様
 
-  point_t point[NMAX+1];
+  point_t point[NMAX+CROSS+1];
   point_t crossing[CROSS];
   point_t tmpPoint;
 
@@ -46,17 +46,17 @@ int main() {
 
   /* xが小さい順にソート */
   sortCrossing(crossing, crossCount, n);
-
+  
   // 交差地点を座標の構造体配列へ格納
   crossIndex = crossing[0].id;
   for(i = 0; i < crossCount; i++) {
     point[crossIndex] = crossing[i];
     crossIndex++;
   }
-
+  
   for(i = crossing[0].id; i < crossIndex; i++) {
     if( point[i].id != point[i-1].id ) {
-      printf("%f %f\n", point[i].x, point[i].y);
+      printf("point:%d, %f %f\n", point[i].id, point[i].x, point[i].y);
     }
   }
   

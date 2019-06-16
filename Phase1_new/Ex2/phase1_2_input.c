@@ -17,7 +17,6 @@ void inputPoint(point_t *point, int n) {
     point[i].id = i;  // 座標のidは1からで、point[0]は使わない
     point[i].roadA = -1;
     point[i].roadB = -1;
-    
   }
   
   return;
@@ -45,7 +44,6 @@ void inputRoad(point_t *point, int road[][2], int m) {
 	idQ = tmpid;
       }
     }
-    
 
     point[idP].roadA = -1;    // 端点はroadAやroadBを使わない
     point[idQ].roadA = -1; 
