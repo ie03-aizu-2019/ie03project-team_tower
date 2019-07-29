@@ -4,9 +4,9 @@
 #define TEST_H
 
 extern void outputPoint(point_t*, int);
-extern void outputRoad(int (*)[2], int);
+extern void outputRoad(int**, int);
 extern void outputCrossing(point_t*, int);
-extern void outputEdge(double (*)[], point_t*, int (*)[2], int, int, int);
+extern void outputEdge(double**, point_t*, int**, int, int, int);
 
 #endif
 

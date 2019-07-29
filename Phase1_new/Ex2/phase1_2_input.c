@@ -1,5 +1,7 @@
-/* new version */
+/* new version -- malloc */
+
 #include <stdio.h>
+#include <stdlib.h>
 #include "point.h"
 
 void inputNumber(int* n, int* m, int *p, int *q) {
@@ -9,12 +11,12 @@ void inputNumber(int* n, int* m, int *p, int *q) {
   return;
 }
 
-void inputPoint(point_t *point, int n) {
+void inputPoint(point_t* point, int n) {
   int i;
 
-  for(i = 1; i <= n; i++) {
+  for(i = 0; i < n; i++) {
     scanf("%lf %lf", &point[i].x, &point[i].y);
-    point[i].id = i;  // 座標のidは1からで、point[0]は使わない
+    point[i].id = i + 1;
     point[i].roadA = -1;
     point[i].roadB = -1;
   }
@@ -22,13 +24,19 @@ void inputPoint(point_t *point, int n) {
   return;
 }
 
-void inputRoad(point_t *point, int road[][2], int m) {
+void inputRoad(point_t *point, int** road, int n, int m) {
   int i;
   int tmpid;
   int idP, idQ;
 
-  for(i = 1; i <= m; i++) {
+  for(i = 0; i < m; i++) {
     scanf("%d %d", &idP, &idQ);
+    if( ((idP < 1)||(idP > n)) || ((idQ < 1)||(idQ > n)) ) {
+      fprintf(stderr, "不正な入力です。\n");
+      exit(1);
+    }
+    idP--;
+    idQ--;
     
     // x座標が小さいほうを線分の端点Pとする
     if(point[idP].x > point[idQ].x) {
@@ -45,7 +53,7 @@ void inputRoad(point_t *point, int road[][2], int m) {
       }
     }
 
-    point[idP].roadA = -1;    // 端点はroadAやroadBを使わない
+    point[idP].roadA = -1;    // 端点はroadAやroadBは-1
     point[idQ].roadA = -1; 
     point[idP].roadB = -1;
     point[idQ].roadB = -1;

@@ -2,8 +2,6 @@
 #include <math.h>
 #include "point.h"
 #define EPS 0.000001
-#define NMAX 1000
-#define CROSS 1000
 #define INF 10000000
 
 /*
@@ -14,7 +12,7 @@
 int searchPointIndex(point_t* point, int numberOfPoint, int id) {
   int i;
 
-  for(i = 1; i <= numberOfPoint; i++) {
+  for(i = 0; i < numberOfPoint; i++) {
     if(point[i].id == id) return i;
   }
   return -1;
@@ -39,30 +37,40 @@ double calcDistance(point_t pointA, point_t pointB) {
  * 引数1: 辺, 引数2: 座標, 引数3: 道, 引数4: 道の数, 引数5: 入力座標の数, 引数6: 交点の数 
  * 返り値: なし                
  */
-void generateEdge(double edge[][NMAX], point_t* point,
-		  int road[][2], int m, int n, int crossCount) {
+void generateEdge(double** edge, point_t* point,
+		  int** road, int m, int n, int crossCount) {
   int i, j;
   int numberOfPoint = n + crossCount;
   int idFrom, idTo;
+  int indexFrom = 0;
+  int indexTo = 0;
+
 
   // idが1の道から辺をつくる
-  for(i = 1; i <= m; i++) {
+  for(i = 0; i < m; i++) {
     //　道i上にある交差地点をみつける
     idFrom = road[i][0];    // 最初は端点Pのid
-    for(j = n + 1; j <= numberOfPoint; j++) {
-      if( (point[j].roadA == i) || (point[j].roadB == i) ) {
+    for(j = n; j < numberOfPoint; j++) {
+      if( (point[j].roadA == i + 1) || (point[j].roadB == i + 1) ) {
 	idTo = point[j].id;
 	if(idTo != idFrom) {
-	  edge[idFrom][idTo] = calcDistance(point[idFrom], point[idTo]);
+	  indexFrom = searchPointIndex(point, numberOfPoint, idFrom);
+	  indexTo = searchPointIndex(point, numberOfPoint, idTo);
+	  edge[idFrom][idTo] = calcDistance(point[indexFrom], point[indexTo]);
 	  edge[idTo][idFrom] = edge[idFrom][idTo];
+	  printf("idFrom: %d, idTo: %d, dist: %lf\n", idFrom, idTo, edge[idFrom][idTo]);
 	}
 	idFrom = idTo;
       }
     }
     // 最後の交点と端点Qの間の辺
     idTo = road[i][1];     // 道iの端点Qのid
-    edge[idFrom][idTo] = calcDistance(point[idFrom], point[idTo]);
+    indexFrom = searchPointIndex(point, numberOfPoint, idFrom);
+    indexTo = searchPointIndex(point, numberOfPoint, idTo);
+    edge[idFrom][idTo] = calcDistance(point[indexFrom], point[indexTo]);
     edge[idTo][idFrom] = edge[idFrom][idTo];
+    printf("idFrom: %d, idTo: %d, dist: %lf\n", idFrom, idTo, edge[idFrom][idTo]);
+    printf("-------------------\n");
   }
 
   return;
@@ -73,7 +81,7 @@ void generateEdge(double edge[][NMAX], point_t* point,
  * 引数1: 座標(ノード), 引数2: 辺, 引数3: 座標（ノード）の数
  * 返り値: 最短経路のコスト（距離）                
  */
-double searchShortestPath(point_t *point, double edge[][NMAX], int numberOfPoint, int startid, int goalid) {
+double searchShortestPath(point_t *point, double** edge, int numberOfPoint, int startid, int goalid) {
   double shortestDistance = 0; 
   point_t processPoint;
   point_t tmpPoint;
@@ -84,56 +92,65 @@ double searchShortestPath(point_t *point, double edge[][NMAX], int numberOfPoint
   int i, j;
   int testCounter = 0;
 
+  int startIndex = 0;
+  int indexFori = 0;
+  int indexForj = 0;
+
   if( ((startid > numberOfPoint) || (startid < 1)) || ((goalid > numberOfPoint) || (goalid < 1)) ) {
     shortestDistance = -1;
     return shortestDistance;
   }
 
   // 初期化
-  for(i = 1; i <= numberOfPoint; i++) {
+  for(i = 0; i < numberOfPoint; i++) {
     point[i].done = 1;
   }
 
   for(i = 1; i <= numberOfPoint; i++) {
     for(j = 1; j <= numberOfPoint; j++) {
+      indexFori = searchPointIndex(point, numberOfPoint, i);
+      indexForj = searchPointIndex(point, numberOfPoint, j);
       // 重みつきの辺が存在していたならば
       if(edge[i][j] != 0) {
-	point[i].done = 0;
-	point[j].done = 0;
+	point[indexFori].done = 0;
+	point[indexForj].done = 0;
       }
     }
   }
 
   // ダイクストラ法
   // 全てのノードのコストを大きな数字で初期化
-  for(i = 1; i <= numberOfPoint; i++) {
+  for(i = 0; i < numberOfPoint; i++) {
     point[i].cost = INF;
   }
 
   // 始点だけはコストが0
-  point[startid].cost = 0;
-  processPoint = point[startid];
-  point[startid].done++;
-  
+  startIndex = searchPointIndex(point, numberOfPoint, startid);
+  point[startIndex].cost = 0;
+  processPoint = point[startIndex];
+  point[startIndex].done++;
+
   while(processPoint.id != goalid) {
     // processNodeにつながるノードのコストを更新
     for(i = 1; i <= numberOfPoint; i++) {
       // 辺が存在していたら(つながっていたら)
       if(edge[processPoint.id][i] != 0) {
 	newCost = processPoint.cost + edge[processPoint.id][i];
-	// コストの更新(問題)
-	if(newCost < point[i].cost) point[i].cost = newCost;
+	// コストの更新
+	indexFori = searchPointIndex(point, numberOfPoint, i);
+	if(newCost < point[indexFori].cost) point[indexFori].cost = newCost;
       }
     }
 
     // 訪れていないノードの中でコストがもっとも低いノードを訪れる
     tmpPoint.cost = INF;
     for(i = 1; i <= numberOfPoint; i++) {
-      if(point[i].done == 0) {
+      indexFori = searchPointIndex(point, numberOfPoint, i);
+      if(point[indexFori].done == 0) {
 	// 最小のコスト
-        if(tmpPoint.cost > point[i].cost) {
-	  tmpPoint = point[i];
-	  minCostIndex = i;
+        if(tmpPoint.cost > point[indexFori].cost) {
+	  tmpPoint = point[indexFori];
+	  minCostIndex = indexFori;
 	}
       }
     }

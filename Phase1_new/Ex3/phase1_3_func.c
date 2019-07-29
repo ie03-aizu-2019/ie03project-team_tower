@@ -1,4 +1,5 @@
 /* new version */
+#include <stdio.h>
 #include <math.h>
 #include "point.h"
 #define EPS 0.000001
