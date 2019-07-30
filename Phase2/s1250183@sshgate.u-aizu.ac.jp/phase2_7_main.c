@@ -1,5 +1,4 @@
 #include <stdio.h>
-#include <stdlib.h>
 #include "point.h"
 #include "input.h"
 #include "func_newRoad.h"
@@ -7,31 +6,21 @@
 
 #define NMAX 1000
 #define MMAX 500
-#define CROSS 499500
+#define CROSS 1000
 #define QMAX 100
 #define PMAX 100
-#define PQ 2
 
 int main() {
   int n, m, p, q;
   int i;
 
-  point_t* point;
-  point_t* newPoint;
+  point_t point[NMAX+1];
+  point_t newPoint[PMAX];
   point_t suggestPoint;
-  int** road;
+  int road[MMAX+1][2];
   
   /* 入力部分 */
   inputNumber(&n, &m, &p, &q);
-
-  point = (point_t*) malloc(sizeof(point_t) * (NMAX + CROSS));
-  newPoint = (point_t*) malloc(sizeof(point_t) * PMAX);
-  road = (int**) malloc(sizeof(int*) * m);
-  road[0] = (int*) malloc(sizeof(int) * m * PQ);
-  for(i = 1; i < m; i++) {
-    road[i] = road[i - 1] + PQ;
-  }
-  
   inputPoint(point, n);
   inputRoad(point, road, m);
   inputNewPoint(newPoint, p);
@@ -41,6 +30,11 @@ int main() {
     suggestPoint = suggestNewRoad(point, road, n, m, newPoint[i]);
     printf("%f %f\n", suggestPoint.x, suggestPoint.y);
   }
+
+  /* テスト出力 */
+  outputPoint(point, n);
+  outputRoad(road, m);
+  outputNewPoint(newPoint, p);
   
   return 0;
 }

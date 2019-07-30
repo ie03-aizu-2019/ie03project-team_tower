@@ -1,9 +1,10 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <math.h>
 #include "point.h"
 #define EPS 0.000001
 #define NMAX 1000
-#define CROSS 1000
+#define CROSS 499500
 #define INF 10000000
 
 /*
@@ -100,14 +101,17 @@ double searchShortestPath(point_t *point, double** edge, int numberOfPoint, int 
   
   int i, j;
   int notCrossing = numberOfPoint - crossCount;
+  int error = 0;
 
   int startIndex = 0;
   int indexFori = 0;
   int indexForj = 0;
 
-  int shortestPath[NMAX + CROSS];
+  int* shortestPath;
   int pathid = 0;
   int shortestPathIndex = 0;
+
+  shortestPath = (int*) malloc((NMAX + CROSS) * sizeof(int));
 
   if( ((startid > numberOfPoint) || (startid < 1)) || ((goalid > numberOfPoint) || (goalid < 1)) ) {
     shortestDistance = -1;
@@ -145,6 +149,8 @@ double searchShortestPath(point_t *point, double** edge, int numberOfPoint, int 
   point[startIndex].done++;
 
   while(processPoint.id != goalid) {
+    // 到達できなかったら、エラーとして-1
+    if(error == INF) return -1;
     // processNodeにつながるノードのコストを更新
     for(i = 1; i <= numberOfPoint; i++) {
       // 辺が存在していたら(つながっていたら)
@@ -159,8 +165,6 @@ double searchShortestPath(point_t *point, double** edge, int numberOfPoint, int 
 
 	// 同じ距離の最短経路が複数あった場合
 	if(newCost == point[indexFori].cost) {
-	  //test
-	  //printf("same %d %d\n", processPoint.id, point[indexFori].prePointid);
 	  // 辞書順
 	  if(processPoint.id < point[indexFori].prePointid) {
 	    point[indexFori].prePointid = processPoint.id;
@@ -173,6 +177,8 @@ double searchShortestPath(point_t *point, double** edge, int numberOfPoint, int 
     tmpPoint.cost = INF;
     for(i = 1; i <= numberOfPoint; i++) {
       indexFori = searchPointIndex(point, numberOfPoint, i);
+      // 全てのidについてやったらbreak
+      if(indexFori == -1) break;
       if(point[indexFori].done == 0) {
 	// 最小のコスト
         if(tmpPoint.cost > point[indexFori].cost) {
@@ -183,6 +189,7 @@ double searchShortestPath(point_t *point, double** edge, int numberOfPoint, int 
     }
     processPoint = tmpPoint;
     point[minCostIndex].done++;
+    error++;
   }
   shortestDistance = processPoint.cost;
 
@@ -203,6 +210,8 @@ double searchShortestPath(point_t *point, double** edge, int numberOfPoint, int 
 	  else printf("%d ", shortestPath[i]);
   }
   printf("\n");
+
+  free(shortestPath);
 
   return shortestDistance;
   

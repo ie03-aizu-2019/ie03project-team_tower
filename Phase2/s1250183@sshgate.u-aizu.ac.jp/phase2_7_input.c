@@ -20,9 +20,9 @@ void inputNumber(int* n, int* m, int *p, int *q) {
 void inputPoint(point_t *point, int n) {
   int i;
 
-  for(i = 0; i < n; i++) {
+  for(i = 1; i <= n; i++) {
     scanf("%lf %lf", &point[i].x, &point[i].y);
-    point[i].id = i + 1;
+    point[i].id = i;  // 座標のidは1からで、point[0]は使わない
     point[i].roadA = -1;
     point[i].roadB = -1;
     
@@ -37,12 +37,12 @@ void inputPoint(point_t *point, int n) {
  * 引数3: 道の数 
  * 返り値: なし                
  */
-void inputRoad(point_t *point, int** road, int m) {
+void inputRoad(point_t *point, int road[][2], int m) {
   int i;
   int tmpid;
   int idP, idQ;
 
-  for(i = 0; i < m; i++) {
+  for(i = 1; i <= m; i++) {
     scanf("%d %d", &idP, &idQ);
     
     // x座標が小さいほうを線分の端点Pとする

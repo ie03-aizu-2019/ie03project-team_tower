@@ -4,7 +4,7 @@
 
 extern void inputNumber(int*, int*, int*, int*);
 extern void inputPoint(point_t*, int);
-extern void inputRoad(point_t*, int**, int);
+extern void inputRoad(point_t*, int (*)[2], int);
 extern void inputPath(int*, int*, int, int);
 extern void inputNewPoint(point_t*, int);
 

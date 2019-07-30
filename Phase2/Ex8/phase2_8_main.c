@@ -1,4 +1,3 @@
-/* new version */
 #include <stdio.h>
 #include <stdlib.h>
 #include "point.h"
@@ -8,13 +7,14 @@
 
 #define NMAX 1000
 #define MMAX 500
-#define CROSS 1000
+#define CROSS 499500
 #define QMAX 100
 #define PQ 2
 
 int main() {
   int n, m, p, q;
   int i, j;
+  int indexFori = 0;
   int crossIndex = 0;
   int crossCount = 0;   // 交点の総数
   
@@ -30,20 +30,23 @@ int main() {
   point_t tmpPoint;
 
   double** edge;  // 辺: 中身は座標間の距離
+
+  int* low;
+  int* pre;
   
   /* 入力部分 */
   inputNumber(&n, &m, &p, &q);
 
-  point = (point_t*) malloc(sizeof(point_t) * NMAX);
+  point = (point_t*) malloc(sizeof(point_t) * (NMAX + CROSS));
   road = (int**) malloc(sizeof(int*) * m);
   road[0] = (int*) malloc(sizeof(int) * m * PQ);
   for(i = 1; i < m; i++) {
     road[i] = road[i - 1] + PQ;
   }
-  edge = (double**) malloc(sizeof(double*) * NMAX);
-  edge[0] = (double*) malloc(sizeof(double) * NMAX * NMAX);
-  for(i = 1; i < NMAX; i++) {
-    edge[i] = edge[i - 1] + NMAX;
+  edge = (double**) malloc(sizeof(double*) * (NMAX + CROSS));
+  edge[0] = (double*) malloc(sizeof(double) * (NMAX + CROSS) * (NMAX + CROSS));
+  for(i = 1; i < (NMAX + CROSS); i++) {
+    edge[i] = edge[i - 1] + (NMAX + CROSS);
   }
   
   crossing = (point_t*) malloc(sizeof(point_t) * CROSS);
@@ -51,16 +54,6 @@ int main() {
   inputPoint(point, n);
   inputRoad(point, road, m);
   inputPath(startid, goalid, q, n);
-
-  // test output
-  for(i = 0; i < n; i++) {
-    printf("%d id:%d x:%lf y:%lf roadA:%d roadB%d\n", i, point[i].id, point[i].x, point[i].y,
-	   point[i].roadA, point[i].roadB);
-  }
-
-  for(i = 0; i < m; i++) {
-    printf("%d P:%d, Q:%d\n", i, road[i][0], road[i][1]);
-  }
 
   /* 交差地点を探し出す部分 */
   for(i = 0; i < m - 1; i++) {
@@ -93,30 +86,38 @@ int main() {
   free(crossing);
   numberOfPoint = n + crossCount;  // 全ての座標の数
 
-  // test
+  // 全ての座標を出力（交差地点を含める）
+  printf("~ point(including crossing point) ~\n");
   for(i = 0; i < numberOfPoint; i++) {
     printf("%d id: %d, x:%lf, y:%lf, roadA:%d, roadB:%d\n", i, point[i].id, point[i].x,
 	   point[i].y, point[i].roadA, point[i].roadB);
   }
 
+  // 全ての道を出力
+  printf("~ road list ~\n");
+  for(i = 0; i < m; i++) {
+    printf("%d P:%d, Q:%d\n", i+1, road[i][0], road[i][1]);
+  }
+
   // 辺をつくる
   generateEdge(edge, point, road, m, n, crossCount);
 
-  printf("\n最短経路\n");
-  /* 最短経路探索 */
-  for(i = 0; i < q; i++) {
-    shortestDistance = searchShortestPath(point, edge, numberOfPoint, startid[i], goalid[i]);
-    if(shortestDistance == -1) {
-      printf("NA\n");
-    } else {
-      printf("%f\n", shortestDistance);
-    }
+  printf("~ bridge ~\n");
+  // 橋の検出
+  // 初期化
+  low = (int*) malloc(numberOfPoint * sizeof(int));
+  pre = (int*) malloc(numberOfPoint * sizeof(int));
+  for(i = 0; i < numberOfPoint; i++) {
+    low[i] = -1;
+    pre[i] = -1;
   }
 
-  free(point);
-  free(road);
-  free(edge);
-  
+  for(i = 1; i <= numberOfPoint; i++) {
+    indexFori = searchPointIndex(point, numberOfPoint, i);
+    // 全てのidについてやったらbreak
+    if(indexFori == -1) break;
+    bridgeDfs(point, edge, indexFori, indexFori, low, pre, numberOfPoint);
+  }
+
   return 0;
 }
-

@@ -9,7 +9,7 @@
 
 #define NMAX 1000
 #define MMAX 500
-#define CROSS 1000
+#define CROSS 499500
 #define QMAX 100
 #define PQ 2
 
@@ -35,16 +35,16 @@ int main() {
   /* 入力部分 */
   inputNumber(&n, &m, &p, &q);
 
-  point = (point_t*) malloc(sizeof(point_t) * NMAX);
+  point = (point_t*) malloc(sizeof(point_t) * (NMAX + CROSS));
   road = (int**) malloc(sizeof(int*) * m);
   road[0] = (int*) malloc(sizeof(int) * m * PQ);
   for(i = 1; i < m; i++) {
     road[i] = road[i - 1] + PQ;
   }
-  edge = (double**) malloc(sizeof(double*) * NMAX);
-  edge[0] = (double*) malloc(sizeof(double) * NMAX * NMAX);
-  for(i = 1; i < NMAX; i++) {
-    edge[i] = edge[i - 1] + NMAX;
+  edge = (double**) malloc(sizeof(double*) * (NMAX + CROSS + 1));
+  edge[0] = (double*) malloc(sizeof(double) * (NMAX + CROSS + 1) * (NMAX + CROSS + 1));
+  for(i = 1; i < (NMAX + CROSS + 1); i++) {
+    edge[i] = edge[i - 1] + (NMAX + CROSS + 1);
   }
   
   crossing = (point_t*) malloc(sizeof(point_t) * CROSS);
@@ -89,6 +89,12 @@ int main() {
   for(i = 0; i < numberOfPoint; i++) {
     printf("%d id: %d, x:%lf, y:%lf, roadA:%d, roadB:%d\n", i, point[i].id, point[i].x,
 	   point[i].y, point[i].roadA, point[i].roadB);
+  }
+
+  // 全ての道を出力
+  printf("~ road list ~\n");
+  for(i = 0; i < m; i++) {
+    printf("%d P:%d, Q:%d\n", i+1, road[i][0], road[i][1]);
   }
 
   // 辺をつくる

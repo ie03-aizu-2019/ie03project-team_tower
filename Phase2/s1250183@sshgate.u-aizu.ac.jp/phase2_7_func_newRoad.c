@@ -13,7 +13,7 @@
 int searchPointIndex(point_t* point, int numberOfPoint, int id) {
   int i;
 
-  for(i = 0; i < numberOfPoint; i++) {
+  for(i = 1; i <= numberOfPoint; i++) {
     if(point[i].id == id) return i;
   }
   return -1;
@@ -25,7 +25,7 @@ int searchPointIndex(point_t* point, int numberOfPoint, int id) {
  * 引数1: 座標,  引数2: 道,  引数3: 新しい地点
  * 返り値: 新しい地点から最短の道路網の座標                
  */
-point_t suggestNewRoad(point_t *point, int** road, int n, int m, point_t newPoint) {
+point_t suggestNewRoad(point_t *point, int road[][2], int n, int m, point_t newPoint) {
   int i;
   double x1, y1, x2, y2, x3, y3;
   int pointPIndex, pointQIndex;
@@ -34,8 +34,8 @@ point_t suggestNewRoad(point_t *point, int** road, int n, int m, point_t newPoin
   double min;
   int minIndex;
 
-  double distance[MMAX];
-  double x[MMAX], y[MMAX];
+  double distance[MMAX + 1];
+  double x[MMAX + 1], y[MMAX + 1];
 
   point_t connectPoint;
   point_t notExist = {-1, -1};
@@ -48,7 +48,7 @@ point_t suggestNewRoad(point_t *point, int** road, int n, int m, point_t newPoin
    * 内積が0の時の座標と距離を出す(その道までの最短距離)
    * そのなかで一番距離が小さいものを採用
    */
-  for(i = 0; i < m; i++) {
+  for(i = 1; i <= m; i++) {
     pointPIndex = searchPointIndex(point, n, road[i][0]);
     pointQIndex = searchPointIndex(point, n, road[i][1]);
     // x1, y1 は 線分端点Pの座標
@@ -78,7 +78,7 @@ point_t suggestNewRoad(point_t *point, int** road, int n, int m, point_t newPoin
   // 最短距離の座標を返す
   min = INF;
   minIndex = 0;
-  for(i = 0; i < m; i++) {
+  for(i = 1; i <= m; i++) {
     if( (min > distance[i]) && (x[i] != x3) && (y[i] != y3) ) {
       min = distance[i];
       minIndex = i;
