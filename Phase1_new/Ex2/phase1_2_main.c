@@ -64,6 +64,8 @@ int main() {
       	detectCrossing(point[roadA_P], point[roadA_Q], point[roadB_P], point[roadB_Q]);
       if( (tmpPoint.x != -1) && (tmpPoint.y != -1) ) {
       	crossing[crossCount] = tmpPoint;
+	crossing[crossCount].roadA = i + 1;    // 交差地点は道iの上にある
+	crossing[crossCount].roadB = j + 1;    // 交差地点は道jの上にある
       	crossCount++;
       }
     }
@@ -81,7 +83,8 @@ int main() {
   free(crossing);
   
   for(i = 0; i < crossIndex; i++) {
-    printf("point:%d, %f %f\n", point[i].id, point[i].x, point[i].y);
+    printf("point:%d x:%f, y:%f, roadA:%d, roadB:%d\n", point[i].id, point[i].x, point[i].y,
+	   point[i].roadA, point[i].roadB);
   }
 
   free(point);
